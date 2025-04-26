@@ -26,7 +26,7 @@ import STATUS_TABLE from "@/constants/status.table";
 const Order = () => {
   const [note, setNote] = useState<boolean>(false);
   return (
-    <div className="flex flex-col  ">
+    <div className="flex flex-col pb-26">
       <div className="flex gap-5">
         <div className="flex-[0_0_70%] max-w-[70%] ">
           <Carousel />
@@ -35,15 +35,16 @@ const Order = () => {
               <h3 className="text-lg font-medium">Danh sách các sản phẩm</h3>
               <span>120 sản phẩm</span>
             </div>
-            <div className="grid grid-cols-4 gap-4 overflow-y-auto max-h-[870px] pr-2 mt-4">
+            <div className="grid grid-cols-4 gap-4  mt-4 overflow-y-auto max-h-[90vh] pr-1">
               {Array.from({ length: 32 }).map((_, index) => {
                 return <ProductCard key={index} />;
               })}
             </div>
           </div>
         </div>
-        <div className="flex-[0_0_30%] max-w-[30%]  ">
-          <div className="bg-white rounded-lg p-4 ">
+        {/* Order */}
+        <div className="flex-[0_0_30%] max-w-[30%] ">
+          <div className="bg-white rounded-lg p-4  ">
             <h3 className="text-xl font-medium">New Order</h3>
             <div className=" border-b border-gray-300 py-4 flex flex-col gap-3 ">
               <div className="max-h-[400px] overflow-y-auto flex flex-col gap-3 pr-1">

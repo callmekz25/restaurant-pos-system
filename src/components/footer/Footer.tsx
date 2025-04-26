@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <>
-      <div className="border-t border-gray-300 mx-auto flex items-center justify-center  min-h-[10vh]">
+      <div className="border-t w-full border-gray-300 mx-auto flex items-center  justify-center bg-white   fixed bottom-0">
         <div className="flex items-center gap-40 text-md font-medium">
           <button className="flex items-center gap-3 ">
             <HomeIcon />

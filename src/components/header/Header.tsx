@@ -9,7 +9,7 @@ import { SearchIcon } from "lucide-react";
 
 const Header = () => {
   return (
-    <div className="px-30  min-h-[10vh] flex items-center border-b border-gray-300 justify-between shadow">
+    <div className="px-30   py-3 flex items-center border-b border-gray-300 justify-between shadow">
       <div className="">Logo</div>
       <div className="flex items-center max-w-[40%] flex-1 rounded-md bg-[#f7f7f7] shadow">
         <Select>

@@ -26,7 +26,7 @@ import STATUS_TABLE from "@/constants/status.table";
 const Order = () => {
   const [note, setNote] = useState<boolean>(false);
   return (
-    <div className="flex flex-col pb-26">
+    <div className="flex flex-col ">
       <div className="flex gap-5">
         <div className="flex-[0_0_70%] max-w-[70%] ">
           <Carousel />

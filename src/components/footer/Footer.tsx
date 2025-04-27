@@ -16,13 +16,13 @@ const Footer = () => {
             <HomeIcon />
             <span>Home</span>
           </button>
-          <Link to="/serving/orders" className="flex items-center gap-3 ">
+          <Link to="/serving/orders" className="flex items-center gap-3  ">
             <ListIcon />
             <span>Orders</span>
           </Link>
           <Link
             to="/serving/orders/add"
-            className="flex -translate-y-1/2 items-center gap-3  justify-center bg-[#ebc01c] p-6 rounded-full "
+            className="flex -translate-y-1/2 items-center   justify-center bg-[#ebc01c] p-4.5  rounded-full "
           >
             <ConciergeBellIcon className="size-6 text-black" />
           </Link>

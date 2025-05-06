@@ -1,4 +1,5 @@
 import { BarChartComponent } from "@/components/charts/barChartComponent";
+import { PieChartComponent } from "@/components/charts/pieChartComponent";
 import RecentOrders from "@/components/order/RecentOrders";
 import formatPriceToVND from "@/utils/formatPriceToVND";
 import { BoxIcon, PiggyBank, RotateCcwIcon } from "lucide-react";
@@ -15,6 +16,11 @@ const Home = () => {
         "https://ilmio.vn/uploads/fnb-menu/appetizers/insalata-siciliana.jpg",
       price: 10000,
       name: "Insalata Siciliana",
+    },
+    {
+      image: "https://ilmio.vn/uploads/fnb-menu/pizza/pizza-tonno-cipolla.png",
+      price: 10000,
+      name: "Tonno Cipolla",
     },
     {
       image: "https://ilmio.vn/uploads/fnb-menu/pizza/pizza-tonno-cipolla.png",
@@ -86,7 +92,14 @@ const Home = () => {
         </div>
         <RecentOrders />
       </div>
-      <BarChartComponent />
+      <div className="flex mt-5">
+        <div className="flex-[0_0_70%] max-w-[70%] px-4">
+          <BarChartComponent />
+        </div>
+        <div className="flex-[0_0_30%] max-w-[30%] px-2">
+          <PieChartComponent />
+        </div>
+      </div>
     </>
   );
 };

@@ -1,3 +1,4 @@
+import OrderStatus from "@/enum/orderStatus";
 import formatDate from "@/utils/formatDate";
 import formatPriceToVND from "@/utils/formatPriceToVND";
 import formatTime from "@/utils/formatTime";
@@ -7,15 +8,15 @@ import { Link } from "react-router-dom";
 const OrderCard = ({
   orderCode,
   total_items,
-  total_amount,
+  total,
   dateTime,
   statusOrder,
 }: {
   orderCode: string;
   total_items: number;
-  total_amount: number;
-  dateTime: number;
-  statusOrder: string;
+  total: number;
+  dateTime: Date;
+  statusOrder: OrderStatus;
 }) => {
   return (
     <div className="bg-white shadow rounded-md border border-gray-300 p-3">
@@ -48,7 +49,7 @@ const OrderCard = ({
       <div className="flex items-center justify-between py-2 font-medium opacity-70 ">
         <span>Total amount:</span>
         <span className=" text-orange-600 font-semibold">
-          {formatPriceToVND(total_amount)}
+          {formatPriceToVND(total)}
         </span>
       </div>
       <div className="flex items-center gap-3 mt-4">

@@ -5,7 +5,7 @@ const Layout = () => {
   return (
     <div className="relative">
       <Header />
-      <main className="bg-[#f7f7f7] px-30 pt-5 pb-20 min-h-screen ">
+      <main className="bg-[#f7f7f7] px-20 pt-5 pb-20 min-h-screen ">
         <Outlet />
       </main>
       <Footer />

@@ -12,7 +12,7 @@ const STATUS_ORDER = [
     descr: "Tất cả phiếu",
   },
   {
-    label: "Completed",
+    label: "Finished",
     descr: "Tất cả phiếu",
   },
   {

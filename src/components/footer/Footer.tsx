@@ -12,10 +12,10 @@ const Footer = () => {
     <>
       <div className="border-t w-full border-gray-300 mx-auto flex items-center  justify-center bg-white   fixed bottom-0">
         <div className="flex items-center gap-40 text-md font-medium">
-          <button className="flex items-center gap-3 ">
+          <Link to="/" className="flex items-center gap-3 ">
             <HomeIcon />
             <span>Home</span>
-          </button>
+          </Link>
           <Link to="/serving/orders" className="flex items-center gap-3  ">
             <ListIcon />
             <span>Orders</span>

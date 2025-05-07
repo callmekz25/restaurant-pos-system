@@ -2,10 +2,12 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "../layout";
 import { lazy, Suspense } from "react";
 import PublicRoute from "./publicRoute";
+import Loading from "@/components/ui/loading";
 const Home = lazy(() => import("../pages/home/Home"));
 const Order = lazy(() => import("../pages/order/Order"));
 const OrderList = lazy(() => import("../pages/order/OrderList"));
 const TableList = lazy(() => import("../pages/table/TableList"));
+const TimeTable = lazy(() => import("../pages/time/TimeKeeping"));
 const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -15,7 +17,7 @@ const router = createBrowserRouter([
         children: [
           {
             element: (
-              <Suspense fallback={<div>Loading..</div>}>
+              <Suspense fallback={<Loading />}>
                 <Home />
               </Suspense>
             ),
@@ -23,7 +25,7 @@ const router = createBrowserRouter([
           },
           {
             element: (
-              <Suspense fallback={<div>Loading..</div>}>
+              <Suspense fallback={<Loading />}>
                 <Order />
               </Suspense>
             ),
@@ -31,7 +33,7 @@ const router = createBrowserRouter([
           },
           {
             element: (
-              <Suspense fallback={<div>Loading..</div>}>
+              <Suspense fallback={<Loading />}>
                 <OrderList />
               </Suspense>
             ),
@@ -39,11 +41,19 @@ const router = createBrowserRouter([
           },
           {
             element: (
-              <Suspense fallback={<div>Loading..</div>}>
+              <Suspense fallback={<Loading />}>
                 <TableList />
               </Suspense>
             ),
             path: "/serving/orders/tables",
+          },
+          {
+            element: (
+              <Suspense fallback={<Loading />}>
+                <TimeTable />
+              </Suspense>
+            ),
+            path: "/timekeeping",
           },
         ],
       },

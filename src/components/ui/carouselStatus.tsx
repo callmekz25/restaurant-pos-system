@@ -53,7 +53,7 @@ const CarouselStatus = () => {
           return (
             index > 0 && (
               <div key={st.label} className="px-2 text-[12px] opacity-55 ">
-                <button className="px-2 py-1 bg-[#efeaea] flex items-center gap-2 rounded-md">
+                <button className="px-2 py-1 bg-[#e5e0e0] font-medium flex items-center gap-2 rounded">
                   <ClockIcon className="size-4" />
                   {st.label}
                 </button>

@@ -1,5 +1,5 @@
 enum PaymentMethod {
-  CASE,
-  BANK,
+  CASH = "CASH",
+  BANK = "BANK",
 }
 export default PaymentMethod;

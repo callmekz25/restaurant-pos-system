@@ -45,7 +45,7 @@ export function PieChartComponent() {
   return (
     <ChartContainer
       config={chartConfig}
-      className=" rounded-md max-h-[350px] bg-white"
+      className=" rounded-md max-h-[350px] bg-white border"
     >
       <PieChart>
         <ChartTooltip

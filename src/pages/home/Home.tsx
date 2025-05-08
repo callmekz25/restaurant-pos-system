@@ -34,7 +34,7 @@ const Home = () => {
         <div className="flex-[0_0_70%] max-w-[70%] px-2">
           <div className="flex items-center justify-between flex-wrap">
             <div className="px-2 flex-1">
-              <div className="bg-white rounded-md p-4 ">
+              <div className="bg-white rounded-md p-4 border ">
                 <div className="flex items-center justify-between mb-2">
                   <h3>Total orders</h3>
                   <BoxIcon />
@@ -43,7 +43,7 @@ const Home = () => {
               </div>
             </div>
             <div className="px-2 flex-1">
-              <div className="bg-white rounded-md p-4 ">
+              <div className="bg-white rounded-md p-4  border">
                 <div className="flex items-center justify-between mb-2">
                   <h3>Total amount</h3>
                   <PiggyBank />
@@ -52,7 +52,7 @@ const Home = () => {
               </div>
             </div>
             <div className="px-2 flex-1">
-              <div className="bg-white rounded-md p-4 ">
+              <div className="bg-white rounded-md p-4  border">
                 <div className="flex items-center justify-between mb-2">
                   <h3>Total return</h3>
                   <RotateCcwIcon />
@@ -62,12 +62,12 @@ const Home = () => {
             </div>
           </div>
           <div className="px-2 mt-5  ">
-            <div className="bg-white rounded-md p-4 h-full">
+            <div className="bg-white rounded-md p-4 h-full border">
               <h3 className="text-lg font-semibold">Best Selling Foods</h3>
               <div className="flex flex-col mt-4 gap-5">
-                {bestSellingFoods.map((food) => {
+                {bestSellingFoods.map((food, index) => {
                   return (
-                    <div className="flex justify-between ">
+                    <div key={index} className="flex justify-between ">
                       <div className="flex gap-4">
                         <div className="flex items-center justify-center rounded-md p-2 bg-gray-100">
                           <img

@@ -31,7 +31,7 @@ export function BarChartComponent() {
   return (
     <ChartContainer
       config={chartConfig}
-      className=" w-full bg-white rounded-md  max-h-[500px] p-3 pb-8 "
+      className=" w-full bg-white rounded-md  max-h-[500px] p-3 pb-8 border "
     >
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Doanh thu theo tuần</h3>

@@ -7,7 +7,7 @@ const Home = lazy(() => import("../pages/home/Home"));
 const Order = lazy(() => import("../pages/order/Order"));
 const OrderList = lazy(() => import("../pages/order/OrderList"));
 const TableList = lazy(() => import("../pages/table/TableList"));
-const TimeTable = lazy(() => import("../pages/time/TimeKeeping"));
+const TimeTable = lazy(() => import("../pages/time/TimeSheet"));
 const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
                 <TimeTable />
               </Suspense>
             ),
-            path: "/timekeeping",
+            path: "/timesheet",
           },
         ],
       },

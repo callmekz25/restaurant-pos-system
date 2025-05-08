@@ -3,7 +3,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ProductCard from "@/components/ui/productCard";
 import { PenBoxIcon } from "lucide-react";
-import TABLES from "@/constants/table";
+import ITable from "@/interfaces/table/table.interface";
 import {
   Dialog,
   DialogTrigger,
@@ -22,9 +22,15 @@ import {
 import OrderItem from "@/components/order/OrderItem";
 import { useState } from "react";
 import STATUS_TABLE from "@/constants/status.table";
-
+import { useGetTables } from "@/hooks/table";
+import Loading from "@/components/ui/loading";
 const Order = () => {
   const [note, setNote] = useState<boolean>(false);
+  const { data: tables, isLoading, error } = useGetTables();
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <div className="flex flex-col ">
       <div className="flex gap-5">
@@ -123,16 +129,17 @@ const Order = () => {
                         })}
                       </div>
                       <div className="flex flex-wrap gap-8">
-                        {TABLES.map((table) => {
-                          return (
-                            <Table
-                              key={table.id}
-                              numberOfSeats={table.quantity}
-                              numberOfTable={table.id}
-                              defaultSize={70}
-                            />
-                          );
-                        })}
+                        {tables &&
+                          tables.map((table: ITable) => {
+                            return (
+                              <Table
+                                key={table.seatId}
+                                numberOfSeats={table.numberOfSeat}
+                                numberOfTable={table.seatId}
+                                status={table.seatStatus}
+                              />
+                            );
+                          })}
                       </div>
                       <div className="flex items-center text-sm justify-end gap-5">
                         <button className="px-4 py-1.5 border border-gray-300 rounded">

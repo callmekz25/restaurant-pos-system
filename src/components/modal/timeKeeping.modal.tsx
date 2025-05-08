@@ -14,64 +14,60 @@ import {
 } from "../../components/ui/dialog";
 import formatDate from "@/utils/formatDate";
 import { PlusIcon, TrashIcon } from "lucide-react";
+import ITimeSheet from "@/interfaces/timesheet/timeSheet.interface";
 const TimeKeepingModal = ({
-  empId,
+  emp,
   open,
   onOpenchange,
 }: {
-  empId: string;
+  emp: ITimeSheet;
   open: boolean;
   onOpenchange: () => void;
 }) => {
   const [statusTimeKeeping, setStatusTimeKeeping] = useState("work");
-  const [menuTimeKeeping, setMenuTimeKeeping] = useState("timekeeping");
+  const [menuTimeKeeping, setMenuTimeKeeping] = useState("attendance");
   return (
     <Dialog open={open} onOpenChange={onOpenchange}>
       <DialogTitle className="hidden"></DialogTitle>
       <DialogContent className=" outline-none rounded px-5 py-5 flex flex-col min-w-[700px] ">
         <DialogDescription className="hidden"></DialogDescription>
-        <h3 className="text-xl font-semibold text-center">Chấm công</h3>
-        <h4>
-          Nhân viên: <span className="font-semibold">{empId}</span>
-        </h4>
-        <div className="flex justify-between ">
+        <h3 className="text-xl font-semibold text-center">Time Sheet</h3>
+        <div className="flex justify-between items-start ">
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium">Thời gian:</span>
-              <span>{formatDate(new Date())}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium">Ca làm việc:</span>
+            <h4 className="text-sm font-medium">
+              Employee Name:{" "}
+              <span className="font-semibold text-[16px] ">{emp.empName}</span>
+            </h4>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="font-medium">Work Shifts:</span>
               <Select defaultValue="F1">
                 <SelectTrigger className=" border border-gray-300  rounded outline-none shadow-none  text-black ">
                   <SelectValue placeholder="Chọn ca làm" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="F1">Sáng (10:00 - 18:00)</SelectItem>
-                  <SelectItem value="F2">Tối (14:00 - 22:00)</SelectItem>
+                  <SelectItem value="F1">F1 (10:00 - 18:00)</SelectItem>
+                  <SelectItem value="F2">F2 (14:00 - 22:00)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <textarea
-            name="note"
-            id="note"
-            className="border border-gray-300 min-h-[70px] flex-[0_0_45%] rounded placeholder:text-sm p-2 text-sm outline-none"
-            placeholder="Ghi chú..."
-          ></textarea>
+          <div className="flex items-center gap-4 text-sm">
+            <span className="font-medium">Time:</span>
+            <span className="text-[16px] ">{formatDate(new Date())}</span>
+          </div>
         </div>
         <div className="">
           <div className=" border-b border-gray-400 pb-2 text-sm mt-5">
             <ul className="flex items-center ">
               <li
-                onClick={() => setMenuTimeKeeping("timekeeping")}
+                onClick={() => setMenuTimeKeeping("attendance")}
                 className={`px-5 cursor-pointer ${
-                  menuTimeKeeping === "timekeeping"
+                  menuTimeKeeping === "attendance"
                     ? "text-blue-700 opacity-100"
                     : "opacity-70 "
                 }`}
               >
-                Chấm công
+                Attendance
               </li>
               <li
                 className={`px-5 cursor-pointer ${
@@ -81,7 +77,7 @@ const TimeKeepingModal = ({
                 }`}
                 onClick={() => setMenuTimeKeeping("violation")}
               >
-                Phạt vi phạm
+                Violation
               </li>
               <li
                 onClick={() => setMenuTimeKeeping("reward")}
@@ -91,15 +87,15 @@ const TimeKeepingModal = ({
                     : "opacity-70 "
                 }`}
               >
-                Thưởng
+                Reward
               </li>
             </ul>
           </div>
           <div className="">
-            {menuTimeKeeping === "timekeeping" && (
+            {menuTimeKeeping === "attendance" && (
               <>
                 <div className="flex items-center gap-10 mt-5 text-[13px]">
-                  <span>Chấm công</span>
+                  <span>Attendance</span>
                   <Select
                     value={statusTimeKeeping}
                     onValueChange={(e) => setStatusTimeKeeping(e)}
@@ -108,18 +104,18 @@ const TimeKeepingModal = ({
                       <SelectValue placeholder="Chọn loại" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="work">Đi làm</SelectItem>
-                      <SelectItem value="off">Nghỉ làm</SelectItem>
+                      <SelectItem value="work">Work</SelectItem>
+                      <SelectItem value="off">Off</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 {statusTimeKeeping === "work" && (
-                  <div className="flex items-center gap-11.5 text-[13px] mt-5">
-                    <label htmlFor="hours">Số giờ làm</label>
+                  <div className="flex items-center gap-10 text-[13px] mt-5">
+                    <label htmlFor="hours">Work Hours</label>
                     <input
                       id="hours"
                       type="number"
-                      className="outline-none border border-gray-200 rounded px-2 py-1.5 w-22"
+                      className="outline-none border border-gray-300 rounded px-2 py-1.5 w-20"
                     />
                   </div>
                 )}

@@ -4,11 +4,7 @@ const STATUS_ORDER = [
     descr: "Tất cả phiếu",
   },
   {
-    label: "Pending",
-    descr: "Tất cả phiếu",
-  },
-  {
-    label: "Processing",
+    label: "Unfinished",
     descr: "Tất cả phiếu",
   },
   {

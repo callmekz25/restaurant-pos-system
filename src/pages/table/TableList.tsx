@@ -1,7 +1,14 @@
 import Table from "@/components/table/Table";
+import Loading from "@/components/ui/loading";
 import STATUS_TABLE from "@/constants/status.table";
-import TABLES from "@/constants/table";
+import { useGetTables } from "@/hooks/table";
+import ITable from "@/interfaces/table/table.interface";
 const TableList = () => {
+  const { data: tables, isLoading, error } = useGetTables();
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <>
       <div className="flex items-center justify-between">
@@ -21,15 +28,17 @@ const TableList = () => {
         </div>
       </div>
       <div className="flex  items-center flex-wrap gap-5 mt-10">
-        {TABLES.map((table) => {
-          return (
-            <Table
-              key={table.id}
-              numberOfSeats={table.quantity}
-              numberOfTable={table.id}
-            />
-          );
-        })}
+        {tables &&
+          tables.map((table: ITable) => {
+            return (
+              <Table
+                key={table.seatId}
+                numberOfSeats={table.numberOfSeat}
+                numberOfTable={table.seatId}
+                status={table.seatStatus}
+              />
+            );
+          })}
       </div>
     </>
   );

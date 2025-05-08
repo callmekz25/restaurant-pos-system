@@ -1,5 +1,5 @@
 enum OrderStatus {
-  UNFINISHED,
-  FINISHED,
+  UNFINISHED = "UNFINISHED",
+  FINISHED = "FINISHED",
 }
 export default OrderStatus;

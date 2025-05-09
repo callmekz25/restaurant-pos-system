@@ -1,4 +1,4 @@
-import { getTimeSheetByMonth } from "@/services/timeKeepingService";
+import { getTimeSheetByMonth } from "@/services/timeSheetService";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetTimeSheetByMonth = (month: string, year: string) => {

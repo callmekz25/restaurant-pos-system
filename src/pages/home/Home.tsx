@@ -2,7 +2,15 @@ import { BarChartComponent } from "@/components/charts/barChartComponent";
 import { PieChartComponent } from "@/components/charts/pieChartComponent";
 import RecentOrders from "@/components/order/RecentOrders";
 import formatPriceToVND from "@/utils/formatPriceToVND";
-import { BoxIcon, PiggyBank, RotateCcwIcon } from "lucide-react";
+import {
+  BoxIcon,
+  CalendarClockIcon,
+  CalendarDaysIcon,
+  CalendarIcon,
+  CalendarRangeIcon,
+  ClockIcon,
+  DollarSignIcon,
+} from "lucide-react";
 const Home = () => {
   const bestSellingFoods = [
     {
@@ -32,32 +40,65 @@ const Home = () => {
     <>
       <div className="flex ">
         <div className="flex-[0_0_70%] max-w-[70%] px-2">
+          <div className="flex items-center justify-between px-2 mb-4">
+            <h2 className="font-bold text-xl">Dashboard</h2>
+            <div className="flex items-center gap-4">
+              <button className="flex items-center gap-2 text-[12px] font-medium bg-white rounded shadow px-2 py-1.5">
+                <CalendarClockIcon className="size-4.5" />
+                Today
+              </button>
+              <button className="flex items-center gap-2 text-[12px] font-medium bg-white rounded shadow px-2 py-1.5">
+                <CalendarDaysIcon className="size-4.5" />
+                This Week
+              </button>
+              <button className="flex items-center gap-2 text-[12px] font-medium bg-white rounded shadow px-2 py-1.5">
+                <CalendarIcon className="size-4.5" />
+                This Month
+              </button>
+              <button className="flex items-center gap-2 text-[12px] font-medium bg-white rounded shadow px-2 py-1.5">
+                <CalendarRangeIcon className="size-4.5" />
+                This Year
+              </button>
+            </div>
+          </div>
           <div className="flex items-center justify-between flex-wrap">
             <div className="px-2 flex-1">
               <div className="bg-white rounded-md p-4 border ">
                 <div className="flex items-center justify-between mb-2">
-                  <h3>Total orders</h3>
-                  <BoxIcon />
+                  <h3 className=" font-medium text-[15px] opacity-70">
+                    Total Orders
+                  </h3>
+                  <div className="bg-red-600 p-1.5 rounded-md">
+                    <BoxIcon className="text-white size-5" />
+                  </div>
                 </div>
-                <span className="font-semibold">1</span>
+                <span className="font-bold text-xl">2</span>
               </div>
             </div>
             <div className="px-2 flex-1">
               <div className="bg-white rounded-md p-4  border">
                 <div className="flex items-center justify-between mb-2">
-                  <h3>Total amount</h3>
-                  <PiggyBank />
+                  <h3 className=" font-medium text-[15px] opacity-70">
+                    Processing Orders
+                  </h3>
+                  <div className="bg-yellow-500 p-1.5 rounded-md">
+                    <ClockIcon className="text-black size-5" />
+                  </div>
                 </div>
-                <span className="font-semibold">1</span>
+                <span className="font-bold text-xl">2</span>
               </div>
             </div>
             <div className="px-2 flex-1">
               <div className="bg-white rounded-md p-4  border">
                 <div className="flex items-center justify-between mb-2">
-                  <h3>Total return</h3>
-                  <RotateCcwIcon />
+                  <h3 className=" font-medium text-[15px] opacity-70">
+                    Total Earnings
+                  </h3>
+                  <div className="bg-green-500 p-1.5 rounded-md">
+                    <DollarSignIcon className="text-white size-5" />
+                  </div>
                 </div>
-                <span className="font-semibold">1</span>
+                <span className="font-bold text-xl">3.000.000đ</span>
               </div>
             </div>
           </div>

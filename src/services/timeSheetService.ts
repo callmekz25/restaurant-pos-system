@@ -10,3 +10,11 @@ export const getTimeSheetByMonth = async (month: string, year: string) => {
     console.log(error);
   }
 };
+export const initTimeSheet = async () => {
+  try {
+    const { data } = await httpRequest.post("/timesheets/init-timesheet");
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};

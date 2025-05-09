@@ -1,5 +1,5 @@
 import Loading from "@/components/ui/loading";
-import { useGetTimeSheetByMonth } from "@/hooks/timeSheet";
+import { useGetTimeSheetByMonth, useInitTimeSheet } from "@/hooks/timeSheet";
 import getDayFromDate from "@/utils/getDayFromDate";
 import { useEffect, useState } from "react";
 import {
@@ -16,12 +16,20 @@ import ITimeSheet from "@/interfaces/timesheet/timeSheet.interface";
 
 const TimeSheet = () => {
   const days = getDaysByMonthYear(6, 2025);
-  const [month, setMonth] = useState("JUNE");
+  const [month, setMonth] = useState("MAY");
   const [year, setYear] = useState("2025");
   const [groupData, setGroupData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectEmp, setSelectEmp] = useState({});
   const { data, isLoading, error } = useGetTimeSheetByMonth(month, year);
+  const { mutate, isPending } = useInitTimeSheet();
+  useEffect(() => {
+    if (!isLoading && data.length === 0 && !error) {
+      mutate(undefined, {
+        onSuccess: () => console.log("Init Success!"),
+      });
+    }
+  }, [data, isLoading, error, mutate]);
   useEffect(() => {
     if (data && data.length > 0) {
       const result = data.reduce((acc, curr) => {
@@ -55,7 +63,7 @@ const TimeSheet = () => {
     setSelectEmp(emp);
   };
 
-  if (isLoading) {
+  if (isLoading || isPending) {
     return <Loading />;
   }
 
@@ -78,9 +86,8 @@ const TimeSheet = () => {
               <SelectValue placeholder="Chọn tháng" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="MAY">May</SelectItem>
               <SelectItem value="JUNE">June</SelectItem>
-              <SelectItem value="7">Tháng 7</SelectItem>
-              <SelectItem value="8">Tháng 8</SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -106,8 +113,16 @@ const TimeSheet = () => {
               <th className="border  border-gray-400 w-10 ">STT</th>
               <th className="border  border-gray-400 w-40 p-5">Full Name</th>
               <th className="border  border-gray-400 w-32">Position</th>
-              {days.map((d) => (
-                <th key={d.day} className="border  border-gray-400 w-10">
+              {days.map((d, i) => (
+                <th
+                  key={d.day}
+                  className={`border  border-gray-400 w-10 ${
+                    i + 1 ===
+                    getDayFromDate(new Date().toISOString().slice(0, 10))
+                      ? "bg-yellow-300"
+                      : ""
+                  }`}
+                >
                   {d.day}
                 </th>
               ))}
@@ -117,7 +132,12 @@ const TimeSheet = () => {
               {days.map((d, i) => (
                 <td
                   key={i}
-                  className="border  border-gray-400 py-4 text-[13px] font-medium"
+                  className={`border  border-gray-400 py-4 text-[13px] font-medium ${
+                    i + 1 ===
+                    getDayFromDate(new Date().toISOString().slice(0, 10))
+                      ? "bg-yellow-300"
+                      : ""
+                  }`}
                 >
                   {d.weekday}
                 </td>

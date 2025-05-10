@@ -29,6 +29,8 @@ import { useGetOrderByTableId } from '@/hooks/order';
 import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
 import { useGetFoods } from '@/hooks/food';
 import Food from '@/interfaces/food/food.interface';
+import FoodType from '@/interfaces/food/foodType.interface';
+import { useGetFoodTypes } from '@/hooks/foodType';
 
 const Order = () => {
   const { tableId } = useParams();
@@ -42,22 +44,31 @@ const Order = () => {
 
   const {
     data: foodsData,
-    isLoading: isFoodsLoading,
+    isLoading: isFoodLoading,
     error: foodError,
   } = useGetFoods();
 
+  const {
+    data: foodTypesData,
+    isLoading: isFoodTypeLoading,
+    error: foodTypeError,
+  } = useGetFoodTypes();
+
   const order = orderData as OnTableOrder;
   const foods = foodsData as Food[];
+  const foodTypes = foodTypesData as FoodType[];
 
-  if (isODLoading || isFoodsLoading) {
+  if (isODLoading || isFoodLoading || isFoodTypeLoading) {
     return <Loading />;
   }
+
+  console.log(foodTypes);
 
   return (
     <div className="flex flex-col ">
       <div className="flex gap-5">
         <div className="flex-[0_0_70%] max-w-[70%] ">
-          <Carousel />
+          <Carousel foodTypes={foodTypes} />
           <div className="mt-4">
             <div className="flex items-center  justify-between">
               <h3 className="text-lg font-medium">Danh sách các sản phẩm</h3>

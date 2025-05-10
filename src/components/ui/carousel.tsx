@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
-import settings from "@/config/carousel/slider";
-import Slider from "react-slick";
-import CATEGORIES from "@/constants/category";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useRef, useState } from 'react';
+import settings from '@/config/carousel/slider';
+import Slider from 'react-slick';
+import CATEGORIES from '@/constants/category';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import FoodType from '@/interfaces/food/foodType.interface';
 
-const Carousel = () => {
+const Carousel = ({ foodTypes }: CarouselPropsList) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   let sliderRef = useRef(null);
   const updateSettings = {
@@ -22,8 +23,8 @@ const Carousel = () => {
       <button
         className={` flex items-center absolute left-5 z-50 top-[50%] opacity-40  -translate-y-1/2 justify-center cursor-pointer bg-white   size-8 rounded-full  transition-all duration-300 ${
           currentIndex === 0
-            ? " cursor-not-allowed  hidden"
-            : "hover:opacity-100 hover:text-black"
+            ? ' cursor-not-allowed  hidden'
+            : 'hover:opacity-100 hover:text-black'
         } `}
         onClick={() => previous()}
         disabled={currentIndex === 0}
@@ -32,12 +33,12 @@ const Carousel = () => {
       </button>
       <button
         className={` flex items-center absolute right-5 z-50 top-[50%] opacity-40  -translate-y-1/2 justify-center cursor-pointer  bg-white  size-8 rounded-full   transition-all duration-300 ${
-          currentIndex === CATEGORIES.length - 4
-            ? " cursor-not-allowed hidden"
-            : "hover:opacity-100 hover:text-black"
+          currentIndex === foodTypes.length - 4
+            ? ' cursor-not-allowed hidden'
+            : 'hover:opacity-100 hover:text-black'
         } `}
         onClick={() => next()}
-        disabled={currentIndex === CATEGORIES.length - 4}
+        disabled={currentIndex === foodTypes.length - 4}
       >
         <ChevronRightIcon className="size-5" />
       </button>
@@ -47,21 +48,21 @@ const Carousel = () => {
           sliderRef = slider;
         }}
       >
-        {CATEGORIES.map((ct) => {
+        {foodTypes.map((ft) => {
           return (
-            <div key={ct.label} className=" relative px-2">
+            <div key={ft.foodTypeId} className=" relative px-2">
               <img
-                src={ct.image}
+                src={ft.foodTypeImage}
                 alt=""
-                className=" object-cover  aspect-[6/4]  rounded-md"
+                className=" object-cover aspect-[6/4]  rounded-md"
               />
               <div
                 className="flex text-white font-medium items-center justify-between absolute left-[50%]  -translate-x-1/2 bottom-3"
-                style={{ width: "calc(100% - 40px)" }}
+                style={{ width: 'calc(100% - 40px)' }}
               >
-                <h3 className="text-xl">{ct.label}</h3>
+                <h3 className="text-xl">{ft.foodTypeName}</h3>
                 <div className="text-[12px] rounded-full px-2 py-1 bg-[#333333] flex items-center justify-center">
-                  <span>{ct.total} items</span>
+                  <span>0 items</span>
                 </div>
               </div>
             </div>
@@ -70,6 +71,10 @@ const Carousel = () => {
       </Slider>
     </div>
   );
+};
+
+type CarouselPropsList = {
+  foodTypes: FoodType[];
 };
 
 export default Carousel;

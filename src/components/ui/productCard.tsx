@@ -1,28 +1,31 @@
-import { ShoppingCartIcon, PlusIcon, MinusIcon } from "lucide-react";
+import { ShoppingCartIcon, PlusIcon, MinusIcon } from 'lucide-react';
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "../../components/ui/dialog";
-const ProductCard = () => {
+} from '../../components/ui/dialog';
+import Food from '@/interfaces/food/food.interface';
+const ProductCard = ({ food }: ProductCardProps) => {
   return (
     <div className=" rounded-md overflow-hidden border border-gray-200 shadow flex flex-col flex-1">
       <img
-        src="https://images.unsplash.com/photo-1744179211676-f0536705fcd3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        src={food.foodImage}
         alt=""
         className=" object-cover aspect-[5.5/5]"
       />
       <div className="bg-white p-3">
-        <h3 className="text-md font-medium line-clamp-1">Pizza hải sản</h3>
+        <h3 className="text-md font-medium line-clamp-1">{food.foodName}</h3>
         <div className="flex items-center justify-between mt-1.5">
-          <span className=" font-medium text-sm">100.000đ</span>
+          <span className=" font-medium text-sm">
+            {food.price.toLocaleString()} vnd
+          </span>
           <Dialog>
             <DialogTrigger asChild>
               <button className="flex text-[13px] font-medium items-center gap-2 rounded border border-gray-300 py-1.5 px-2">
                 <ShoppingCartIcon className="size-4" />
-                <span>Thêm</span>
+                <span>Add</span>
               </button>
             </DialogTrigger>
             <DialogTitle className="hidden"></DialogTitle>
@@ -30,15 +33,18 @@ const ProductCard = () => {
               <DialogDescription className="hidden"></DialogDescription>
               <div className="flex-[0_0_50%]">
                 <img
-                  src="https://images.unsplash.com/photo-1744179211676-f0536705fcd3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  src={food.foodImage}
                   className=" w-full max-w-full h-full object-cover"
                   alt=""
                 />
               </div>
               <div className="flex-[0_0_50%] ml-3 max-w-[50%] pr-5">
-                <h3 className="text-2xl font-semibold">Pizza Seafood</h3>
+                <h3 className="text-2xl font-semibold">{food.foodName}</h3>
                 <p className="mt-3 font-normal text-lg">
-                  Price: <span className="font-semibold">100.000d</span>
+                  Price:{' '}
+                  <span className="font-semibold">
+                    {food.price.toLocaleString()} vnd
+                  </span>
                 </p>
                 <div className="flex flex-col mt-6 gap-4">
                   {/* Variants */}
@@ -56,7 +62,7 @@ const ProductCard = () => {
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-5">
+                  {/* <div className="flex items-center gap-5">
                     <p className=" text-sm">Toppings:</p>
                     <div className="flex items-center gap-3 text-sm">
                       <label
@@ -74,7 +80,7 @@ const ProductCard = () => {
                         <input type="checkbox" id="cheese" className="hidden" />
                       </label>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="flex text-sm items-center gap-5">
                     <span>Số lượng:</span>
                     <div className="flex items-center ">
@@ -114,6 +120,10 @@ const ProductCard = () => {
       </div>
     </div>
   );
+};
+
+type ProductCardProps = {
+  food: Food;
 };
 
 export default ProductCard;

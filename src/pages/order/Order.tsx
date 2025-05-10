@@ -71,8 +71,8 @@ const Order = () => {
           <Carousel foodTypes={foodTypes} />
           <div className="mt-4">
             <div className="flex items-center  justify-between">
-              <h3 className="text-lg font-medium">Danh sách các sản phẩm</h3>
-              <span>120 sản phẩm</span>
+              <h3 className="text-lg font-medium">Food List</h3>
+              <span>{foods.length} items</span>
             </div>
             <div className="grid grid-cols-4 gap-4  mt-4 overflow-y-auto max-h-[90vh] pr-1">
               {foods.map((food) => (

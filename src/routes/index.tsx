@@ -37,7 +37,7 @@ const router = createBrowserRouter([
                 <Order />
               </Suspense>
             ),
-            path: '/serving/orders/details/:tableId',
+            path: '/serving/orders/:tableId',
           },
           {
             element: (

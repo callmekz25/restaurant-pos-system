@@ -1,13 +1,13 @@
-import { createBrowserRouter } from "react-router-dom";
-import Layout from "../layout";
-import { lazy, Suspense } from "react";
-import PublicRoute from "./publicRoute";
-import Loading from "@/components/ui/loading";
-const Home = lazy(() => import("../pages/home/Home"));
-const Order = lazy(() => import("../pages/order/Order"));
-const OrderList = lazy(() => import("../pages/order/OrderList"));
-const TableList = lazy(() => import("../pages/table/TableList"));
-const TimeTable = lazy(() => import("../pages/time/TimeSheet"));
+import { createBrowserRouter } from 'react-router-dom';
+import Layout from '../layout';
+import { lazy, Suspense } from 'react';
+import PublicRoute from './publicRoute';
+import Loading from '@/components/ui/loading';
+const Home = lazy(() => import('../pages/home/Home'));
+const Order = lazy(() => import('../pages/order/Order'));
+const OrderList = lazy(() => import('../pages/order/OrderList'));
+const TableList = lazy(() => import('../pages/table/TableList'));
+const TimeTable = lazy(() => import('../pages/time/TimeSheet'));
 const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -21,15 +21,7 @@ const router = createBrowserRouter([
                 <Home />
               </Suspense>
             ),
-            path: "/",
-          },
-          {
-            element: (
-              <Suspense fallback={<Loading />}>
-                <Order />
-              </Suspense>
-            ),
-            path: "/serving/orders/add",
+            path: '/',
           },
           {
             element: (
@@ -37,7 +29,15 @@ const router = createBrowserRouter([
                 <OrderList />
               </Suspense>
             ),
-            path: "/serving/orders",
+            path: '/serving/orders',
+          },
+          {
+            element: (
+              <Suspense fallback={<Loading />}>
+                <Order />
+              </Suspense>
+            ),
+            path: '/serving/orders/details/:tableId',
           },
           {
             element: (
@@ -45,7 +45,7 @@ const router = createBrowserRouter([
                 <TableList />
               </Suspense>
             ),
-            path: "/serving/orders/tables",
+            path: '/serving/orders/tables',
           },
           {
             element: (
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
                 <TimeTable />
               </Suspense>
             ),
-            path: "/timesheet",
+            path: '/timesheet',
           },
         ],
       },

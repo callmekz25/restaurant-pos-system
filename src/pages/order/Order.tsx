@@ -1,36 +1,58 @@
-import Carousel from "@/components/ui/carousel";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import ProductCard from "@/components/ui/productCard";
-import { PenBoxIcon } from "lucide-react";
-import ITable from "@/interfaces/table/table.interface";
+import Carousel from '@/components/ui/carousel';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import ProductCard from '@/components/ui/productCard';
+import { PenBoxIcon } from 'lucide-react';
+import ITable from '@/interfaces/table/table.interface';
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "../../components/ui/dialog";
-import Table from "@/components/table/Table";
+} from '../../components/ui/dialog';
+import Table from '@/components/table/Table';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import OrderItem from "@/components/order/OrderItem";
-import { useState } from "react";
-import STATUS_TABLE from "@/constants/status.table";
-import { useGetTables } from "@/hooks/table";
-import Loading from "@/components/ui/loading";
-const Order = () => {
-  const [note, setNote] = useState<boolean>(false);
-  const { data: tables, isLoading, error } = useGetTables();
+} from '@/components/ui/select';
+import OrderItem from '@/components/order/OrderItem';
+import { useState } from 'react';
+import STATUS_TABLE from '@/constants/status.table';
+import { useGetTables } from '@/hooks/table';
+import Loading from '@/components/ui/loading';
+import { useParams } from 'react-router-dom';
+import { useGetOrderByTableId } from '@/hooks/order';
+import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
+import { useGetFoods } from '@/hooks/food';
+import Food from '@/interfaces/food/food.interface';
 
-  if (isLoading) {
+const Order = () => {
+  const { tableId } = useParams();
+  const [note, setNote] = useState<boolean>(false);
+
+  const {
+    data: orderData,
+    isLoading: isODLoading,
+    error: orderDetailError,
+  } = useGetOrderByTableId(tableId ?? '');
+
+  const {
+    data: foodsData,
+    isLoading: isFoodsLoading,
+    error: foodError,
+  } = useGetFoods();
+
+  const order = orderData as OnTableOrder;
+  const foods = foodsData as Food[];
+
+  if (isODLoading || isFoodsLoading) {
     return <Loading />;
   }
+
   return (
     <div className="flex flex-col ">
       <div className="flex gap-5">
@@ -42,22 +64,25 @@ const Order = () => {
               <span>120 sản phẩm</span>
             </div>
             <div className="grid grid-cols-4 gap-4  mt-4 overflow-y-auto max-h-[90vh] pr-1">
-              {Array.from({ length: 32 }).map((_, index) => {
-                return <ProductCard key={index} />;
-              })}
+              {foods.map((food) => (
+                <ProductCard key={food.foodId} food={food} />
+              ))}
             </div>
           </div>
         </div>
         {/* Order */}
         <div className="flex-[0_0_30%] max-w-[30%] ">
           <div className="bg-white rounded-lg p-4  ">
-            <h3 className="text-xl font-medium">New Order</h3>
+            <h3 className="text-xl font-medium">Table {tableId}</h3>
             <div className=" border-b border-gray-300 py-4 flex flex-col gap-3 ">
               <div className="max-h-[400px] overflow-y-auto flex flex-col gap-3 pr-1">
+                {order.foods.map((food) => (
+                  <OrderItem orderDetail={food} />
+                ))}
+                {/* <OrderItem />
                 <OrderItem />
                 <OrderItem />
-                <OrderItem />
-                <OrderItem />
+                <OrderItem /> */}
               </div>
               {/* <div className="border-b border-gray-300 py-4">
                 <p className="text-center">Chưa chọn món</p>
@@ -83,7 +108,7 @@ const Order = () => {
                 )}
               </div>
               <div className="bg-[#f8fbf8] shadow rounded p-3 mt-2 flex flex-col">
-                <div className="flex items-center justify-between pb-3 border-b border-gray-300">
+                {/* <div className="flex items-center justify-between pb-3 border-b border-gray-300">
                   <span className="text-md font-medium">Order method</span>
                   <Select defaultValue="dinein">
                     <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black min-w-[100px]">
@@ -95,8 +120,8 @@ const Order = () => {
                       <SelectItem value="takeaway">Take away</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="flex items-center justify-between mt-2 px-2 text-sm">
+                </div> */}
+                {/* <div className="flex items-center justify-between mt-2 px-2 text-sm">
                   <p className="font-medium">
                     Số bàn: <span className=" font-normal">Chưa chọn</span>
                   </p>
@@ -134,6 +159,7 @@ const Order = () => {
                             return (
                               <Table
                                 key={table.seatId}
+                                tableId={table.seatId}
                                 numberOfSeats={table.numberOfSeat}
                                 numberOfTable={table.seatId}
                                 status={table.seatStatus}
@@ -151,21 +177,21 @@ const Order = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="flex flex-col gap-2 mt-2 text-md">
               <div className="flex items-center justify-between">
-                <span>Subtotal:</span>
-                <span>100.000đ</span>
+                <span>SURCHARGE: </span>
+                <span>{order.surcharge.toLocaleString()} vnd</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>VAT:</span>
-                <span>20.000đ</span>
+                <span>Discount: </span>
+                <span>{order.discount * 100}%</span>
               </div>
               <div className="flex font-medium text-lg items-center justify-between">
-                <span>Total:</span>
-                <span>120.000đ</span>
+                <span>Total: </span>
+                <span>{order.total.toLocaleString()} vnd</span>
               </div>
             </div>
             <button className="bg-[#ebc01c] py-2 text-black font-medium w-full rounded mt-4">

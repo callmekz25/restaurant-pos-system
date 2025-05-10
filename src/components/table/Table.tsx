@@ -1,18 +1,24 @@
-import TableStatus from "@/enum/tableStatus";
+import TableStatus from '@/enum/tableStatus';
+import { Link } from 'react-router-dom';
 
 const Table = ({
+  tableId,
   numberOfSeats,
   numberOfTable,
   defaultSize = 100,
   status,
 }: {
+  tableId: string;
   numberOfSeats: number;
   numberOfTable: string;
   defaultSize?: number;
   status: string;
 }) => {
   return (
-    <div className="p-2 border border-gray-100 transition-all duration-300 cursor-pointer hover:border-blue-700  rounded-md">
+    <Link
+      to={`/serving/orders/${tableId}`}
+      className="p-2 border border-gray-100 transition-all duration-300 cursor-pointer hover:border-blue-700 rounded-md"
+    >
       <div
         className=" flex flex-col gap-3"
         style={{ width: `${(numberOfSeats / 2) * defaultSize}px` }}
@@ -31,18 +37,18 @@ const Table = ({
           <span
             className={` py-2 font-semibold px-3 rounded-md ${
               status === TableStatus.AVAILABLE
-                ? "bg-[#c0d7ce] text-green-600"
-                : ""
+                ? 'bg-[#c0d7ce] text-green-600'
+                : ''
             } ${
-              status === TableStatus.RESERVED ? "bg-[#e7ccc6] text-red-600" : ""
+              status === TableStatus.RESERVED ? 'bg-[#e7ccc6] text-red-600' : ''
             } ${
               status === TableStatus.OCCUPIED
-                ? "bg-[#c6cee7] text-blue-600"
-                : ""
+                ? 'bg-[#c6cee7] text-blue-600'
+                : ''
             }  ${
               status === TableStatus.UNAVAILABLE
-                ? "bg-[#d4d5dc] text-gray-400"
-                : ""
+                ? 'bg-[#d4d5dc] text-gray-400'
+                : ''
             }`}
           >
             {numberOfTable}
@@ -59,7 +65,7 @@ const Table = ({
           })}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

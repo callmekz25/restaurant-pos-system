@@ -1,8 +1,8 @@
 import httpRequest from "@/config/axios/axios.config";
 
-export const getFoods = async () => {
+export const getFoodTypes = async () => {
   try {
-    const { data } = await httpRequest.get("/foods");
+    const { data } = await httpRequest.get("/food-types");
     return data;
   } catch (error) {
     console.log(error);

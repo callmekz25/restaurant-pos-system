@@ -6,6 +6,6 @@ interface OnTableOrderDetail {
   variantName: string;
   note: string;
   amount: number;
-  actutalPrice: number;
+  actualPrice: number;
 }
 export default OnTableOrderDetail;

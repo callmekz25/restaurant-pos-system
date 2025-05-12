@@ -33,6 +33,7 @@ const TableList = () => {
             return (
               <Table
                 key={table.seatId}
+                tableId={table.seatId}
                 numberOfSeats={table.numberOfSeat}
                 numberOfTable={table.seatId}
                 status={table.seatStatus}

@@ -1,3 +1,4 @@
+import CreateOrderRequest from '@/interfaces/order/createOrderRequest.interface';
 import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
 import {
   createOrder,
@@ -22,6 +23,6 @@ export const useGetOrderByTableId = (tableId: string) => {
 
 export const useCreateOrder = () => {
   return useMutation({
-    mutationFn: (order: OnTableOrder) => createOrder(order),
+    mutationFn: (createOrderRequest: CreateOrderRequest) => createOrder(createOrderRequest),
   });
 };

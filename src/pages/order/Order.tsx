@@ -33,6 +33,7 @@ import FoodType from '@/interfaces/food/foodType.interface';
 import { useGetFoodTypes } from '@/hooks/foodType';
 import OnTableOrderDetail from '@/interfaces/order/onTableOrderDetail.interface';
 import PaymentMethod from '@/enum/paymentMethod';
+import CreateOrderRequest from '@/interfaces/order/createOrderRequest.interface';
 
 const Order = () => {
   const { tableId } = useParams();
@@ -44,6 +45,7 @@ const Order = () => {
     serverId: 'EMP001',
     timeIn: new Date(),
     foods: [] as OnTableOrderDetail[],
+    note: '',
     discount: 0,
     surcharge: 0,
     paymentMethod: PaymentMethod.CASH,
@@ -76,6 +78,7 @@ const Order = () => {
   useEffect(() => {
     if (orderData != undefined) {
       setOrder(orderData);
+      setNote(orderData.note);
     }
   }, [orderData]);
 
@@ -117,8 +120,17 @@ const Order = () => {
 
   // Ham xu ly dat mon
   const processOrder = (order: OnTableOrder) => {
-    createOrder(order, {
-      onSuccess: () => console.log(order),
+    const requestData = {
+      seatId: tableId,
+      serverId: order.serverId,
+      note: note,
+      foods: order.foods,
+    } as CreateOrderRequest;
+
+    console.log(requestData);
+
+    createOrder(requestData, {
+      onSuccess: () => console.log(requestData),
     });
   };
 
@@ -180,6 +192,7 @@ const Order = () => {
                     placeholder="Thêm ghi chú cho đơn hàng..."
                     id="note"
                     defaultValue={note}
+                    value={note}
                     onChange={(e) => setNote(e.target.value)}
                   ></textarea>
                 )}

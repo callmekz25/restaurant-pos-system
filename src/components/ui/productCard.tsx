@@ -7,7 +7,12 @@ import {
   DialogDescription,
 } from '../../components/ui/dialog';
 import Food from '@/interfaces/food/food.interface';
-const ProductCard = ({ food }: ProductCardProps) => {
+import { useState } from 'react';
+import OnTableOrderDetail from '@/interfaces/order/onTableOrderDetail.interface';
+const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
+  const [amount, setAmount] = useState<number>(1);
+  const [note, setNote] = useState<string>('');
+
   return (
     <div className=" rounded-md overflow-hidden border border-gray-200 shadow flex flex-col flex-1">
       <img
@@ -23,7 +28,7 @@ const ProductCard = ({ food }: ProductCardProps) => {
           </span>
           <Dialog>
             <DialogTrigger asChild>
-              <button className="flex text-[13px] font-medium items-center gap-2 rounded border border-gray-300 py-1.5 px-2">
+              <button className="flex text-[13px] font-medium items-center gap-2 rounded border border-gray-300 py-1.5 px-2 cursor-pointer hover:opacity-60">
                 <ShoppingCartIcon className="size-4" />
                 <span>Add</span>
               </button>
@@ -84,13 +89,19 @@ const ProductCard = ({ food }: ProductCardProps) => {
                   <div className="flex text-sm items-center gap-5">
                     <span>Số lượng:</span>
                     <div className="flex items-center ">
-                      <button className="border border-gray-200 p-2  bg-[#f9f9f9]">
+                      <button
+                        className="border border-gray-200 p-2 bg-[#f9f9f9] cursor-pointer hover:opacity-60"
+                        onClick={() => setAmount(amount - 1)}
+                      >
                         <MinusIcon className="size-4" />
                       </button>
                       <span className="border font-semibold border-gray-200 px-4 py-1.5 text-sm ">
-                        1
+                        {amount}
                       </span>
-                      <button className="border border-gray-200 p-2  bg-[#f9f9f9]">
+                      <button
+                        className="border border-gray-200 p-2  bg-[#f9f9f9] cursor-pointer hover:opacity-60"
+                        onClick={() => setAmount(amount + 1)}
+                      >
                         <PlusIcon className="size-4" />
                       </button>
                     </div>
@@ -102,14 +113,30 @@ const ProductCard = ({ food }: ProductCardProps) => {
                       placeholder="Thêm ghi chú cho món này"
                       className=" text-[13px] outline-none rounded placeholder:text-[13px] border border-gray-200 py-2 px-2  flex-1 resize-none min-h-[100px]"
                       id="note"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
                     ></textarea>
                   </div>
                 </div>
                 <div className="flex items-center text-[13px] justify-end font-medium  gap-5 mt-5">
-                  <button className="border border-gray-300 px-4 py-1.5 rounded">
+                  <button className="border border-gray-300 px-4 py-1.5 rounded cursor-pointer hover:opacity-60">
                     Huỷ
                   </button>
-                  <button className="bg-[#ebc01c] px-3 py-2 rounded">
+                  <button
+                    className="bg-[#ebc01c] px-3 py-2 rounded cursor-pointer hover:opacity-60"
+                    onClick={() =>
+                      onAddToCart({
+                        foodId: food.foodId,
+                        foodImage: food.foodImage,
+                        foodName: food.foodName,
+                        amount: amount,
+                        note: note,
+                        actualPrice: amount * food.price,
+                        variantId: '',
+                        variantName: '',
+                      } as OnTableOrderDetail)
+                    }
+                  >
                     Thêm vào đơn
                   </button>
                 </div>
@@ -124,6 +151,7 @@ const ProductCard = ({ food }: ProductCardProps) => {
 
 type ProductCardProps = {
   food: Food;
+  onAddToCart: Function;
 };
 
 export default ProductCard;

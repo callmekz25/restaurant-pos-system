@@ -8,11 +8,12 @@ export const useGetTimeSheetByMonth = (month: string, year: string) => {
   return useQuery({
     queryKey: ["time-sheets", month, year],
     queryFn: () => getTimeSheetByMonth(month, year),
-    enabled: !!month && !!year,
+    enabled: !!month && !!year,    
   });
 };
+
 export const useInitTimeSheet = () => {
   return useMutation({
-    mutationFn: initTimeSheet,
+    mutationFn: initTimeSheet,    
   });
 };

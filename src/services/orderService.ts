@@ -17,3 +17,12 @@ export const getOrderByTableId = async (tableId: string) => {
     console.log(error);
   }
 };
+
+export const createOrder = async () => {
+  try {
+    const { data } = await httpRequest.post('/orders');
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};

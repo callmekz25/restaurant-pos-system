@@ -41,7 +41,7 @@ const Order = () => {
   const [order, setOrder] = useState<OnTableOrder>({
     orderId: '',
     seatId: tableId ?? '',
-    serverId: '',
+    serverId: 'EMP001',
     timeIn: new Date(),
     foods: [] as OnTableOrderDetail[],
     discount: 0,
@@ -50,7 +50,7 @@ const Order = () => {
     total: 0,
   });
 
-  const { mutate, isPending } = useCreateOrder();
+  const { mutate: createOrder, isPending } = useCreateOrder();
 
   const {
     data: foodsData,
@@ -86,11 +86,8 @@ const Order = () => {
     return <Loading />;
   }
 
+  // Ham them/chon food vao order
   const addFood = (od: OnTableOrderDetail) => {
-    mutate(undefined, {
-      onSuccess: () => console.log('Init Success!'),
-    });
-
     let isNew = true;
 
     order.foods.forEach((food) => {
@@ -118,7 +115,12 @@ const Order = () => {
       }));
   };
 
-  const processOrder = (order: OnTableOrder) => {};
+  // Ham xu ly dat mon
+  const processOrder = (order: OnTableOrder) => {
+    createOrder(order, {
+      onSuccess: () => console.log(order),
+    });
+  };
 
   return (
     <div className="flex flex-col ">

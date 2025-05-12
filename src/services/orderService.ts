@@ -1,4 +1,5 @@
 import httpRequest from '@/config/axios/axios.config';
+import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
 
 export const getOrders = async () => {
   try {
@@ -18,9 +19,9 @@ export const getOrderByTableId = async (tableId: string) => {
   }
 };
 
-export const createOrder = async () => {
+export const createOrder = async (order: OnTableOrder) => {
   try {
-    const { data } = await httpRequest.post('/orders');
+    const { data } = await httpRequest.post('/orders', order);
     return data;
   } catch (error) {
     console.log(error);

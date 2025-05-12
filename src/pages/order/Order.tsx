@@ -33,6 +33,7 @@ import FoodType from '@/interfaces/food/foodType.interface';
 import { useGetFoodTypes } from '@/hooks/foodType';
 import OnTableOrderDetail from '@/interfaces/order/onTableOrderDetail.interface';
 import PaymentMethod from '@/enum/paymentMethod';
+import CreateOrderRequest from '@/interfaces/order/createOrderRequest.interface';
 
 const Order = () => {
   const { tableId } = useParams();
@@ -41,16 +42,17 @@ const Order = () => {
   const [order, setOrder] = useState<OnTableOrder>({
     orderId: '',
     seatId: tableId ?? '',
-    serverId: '',
+    serverId: 'EMP001',
     timeIn: new Date(),
     foods: [] as OnTableOrderDetail[],
+    note: '',
     discount: 0,
     surcharge: 0,
     paymentMethod: PaymentMethod.CASH,
     total: 0,
   });
 
-  const { mutate, isPending } = useCreateOrder();
+  const { mutate: createOrder, isPending } = useCreateOrder();
 
   const {
     data: foodsData,
@@ -76,6 +78,7 @@ const Order = () => {
   useEffect(() => {
     if (orderData != undefined) {
       setOrder(orderData);
+      setNote(orderData.note);
     }
   }, [orderData]);
 
@@ -86,11 +89,8 @@ const Order = () => {
     return <Loading />;
   }
 
+  // Ham them/chon food vao order
   const addFood = (od: OnTableOrderDetail) => {
-    mutate(undefined, {
-      onSuccess: () => console.log('Init Success!'),
-    });
-
     let isNew = true;
 
     order.foods.forEach((food) => {
@@ -118,7 +118,21 @@ const Order = () => {
       }));
   };
 
-  const processOrder = (order: OnTableOrder) => {};
+  // Ham xu ly dat mon
+  const processOrder = (order: OnTableOrder) => {
+    const requestData = {
+      seatId: tableId,
+      serverId: order.serverId,
+      note: note,
+      foods: order.foods,
+    } as CreateOrderRequest;
+
+    console.log(requestData);
+
+    createOrder(requestData, {
+      onSuccess: () => console.log(requestData),
+    });
+  };
 
   return (
     <div className="flex flex-col ">
@@ -178,6 +192,7 @@ const Order = () => {
                     placeholder="Thêm ghi chú cho đơn hàng..."
                     id="note"
                     defaultValue={note}
+                    value={note}
                     onChange={(e) => setNote(e.target.value)}
                   ></textarea>
                 )}

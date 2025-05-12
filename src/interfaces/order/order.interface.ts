@@ -8,6 +8,7 @@ interface Order {
   timeIn: Date;
   timeOut: Date;
   status: OrderStatus;
+  note: string;
   discount: number;
   surcharge: number;
   paymentMethod: PaymentMethod;

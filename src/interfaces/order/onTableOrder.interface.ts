@@ -7,6 +7,7 @@ interface OnTableOrder {
   serverId: string;
   timeIn: Date;
   foods: OnTableOrderDetail[];
+  note: string,
   discount: number;
   surcharge: number;
   paymentMethod: PaymentMethod;

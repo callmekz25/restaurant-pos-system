@@ -1,4 +1,10 @@
-import { createOrder, getOrderByTableId, getOrders } from '@/services/orderService';
+import CreateOrderRequest from '@/interfaces/order/createOrderRequest.interface';
+import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
+import {
+  createOrder,
+  getOrderByTableId,
+  getOrders,
+} from '@/services/orderService';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const useGetOrders = () => {
@@ -15,9 +21,8 @@ export const useGetOrderByTableId = (tableId: string) => {
   });
 };
 
-
 export const useCreateOrder = () => {
   return useMutation({
-    mutationFn: createOrder,    
+    mutationFn: (createOrderRequest: CreateOrderRequest) => createOrder(createOrderRequest),
   });
 };

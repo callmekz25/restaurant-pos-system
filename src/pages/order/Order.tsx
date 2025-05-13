@@ -26,6 +26,7 @@ import { useGetTables } from "@/hooks/table";
 import Loading from "@/components/ui/loading";
 import { useParams } from "react-router-dom";
 import {
+  useAddFood,
   useCreateOrder,
   useGetOrderByTableId,
   usePayOrder,
@@ -39,12 +40,47 @@ import OnTableOrderDetail from "@/interfaces/order/onTableOrderDetail.interface"
 import PaymentMethod from "@/enum/paymentMethod";
 import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface";
 import formatPriceToVND from "@/utils/formatPriceToVND";
+import { ToastContainer, toast } from "react-toastify";
+import TableStatus from "@/enum/tableStatus";
 
 const Order = () => {
+  // useParam
   const { tableId } = useParams();
-  const [noteWriting, setNoteWriting] = useState<boolean>(false);
-  const [note, setNote] = useState<string>("");
-  const [order, setOrder] = useState<OnTableOrder>({
+
+  // useMutate
+  const { mutate: createOrder, isPending } = useCreateOrder();
+  const { mutate: payOrder, isPending: isPayPending } = usePayOrder();
+  const { mutate: addFoodIntoOrder, isPending: isAddFoodPending } =
+    useAddFood();
+
+  const {
+    data: orderData,
+    isLoading: isODLoading,
+    error: orderDetailError,
+  } = useGetOrderByTableId(tableId!);
+
+  // useQuery
+  const {
+    data: foods,
+    isLoading: isFoodLoading,
+    error: foodError,
+  } = useGetFoods();
+
+  const {
+    data: foodTypes,
+    isLoading: isFoodTypeLoading,
+    error: foodTypeError,
+  } = useGetFoodTypes();
+
+  const {
+    data: tables,
+    isLoading: isTablesLoading,
+    error: tableError,
+    refetch: refechTables,
+  } = useGetTables(TableStatus.AVAILABLE);
+
+  // Params
+  const emptyOrder = {
     orderId: "",
     seatId: tableId ?? "",
     serverId: "EMP001",
@@ -55,50 +91,43 @@ const Order = () => {
     surcharge: 0,
     paymentMethod: PaymentMethod.CASH,
     total: 0,
-  });
+  } as OnTableOrder;
 
-  const { mutate: createOrder, isPending } = useCreateOrder();
-  const { mutate: payOrder, isPending: isPayPending } = usePayOrder();
+  // States
+  const [noteWriting, setNoteWriting] = useState<boolean>(false);
+  const [note, setNote] = useState<string>("");
+  const [order, setOrder] = useState<OnTableOrder>(emptyOrder);
+  const [checkedItems, setCheckedItems] = useState({});
 
-  const {
-    data: foodsData,
-    isLoading: isFoodLoading,
-    error: foodError,
-  } = useGetFoods();
-
-  const {
-    data: foodTypesData,
-    isLoading: isFoodTypeLoading,
-    error: foodTypeError,
-  } = useGetFoodTypes();
-
-  const foods = foodsData as Food[];
-  const foodTypes = foodTypesData as FoodType[];
-
-  const {
-    data: orderData,
-    isLoading: isODLoading,
-    error: orderDetailError,
-  } = useGetOrderByTableId(tableId!);
+  // useEffect
 
   useEffect(() => {
     if (orderData != undefined) {
       setOrder(orderData);
       setNote(orderData.note);
+
+      if (Object.keys(checkedItems).length == 0) {
+        let myFoods = orderData.foods as Food[];
+        let myCheckedItems: { [key: string]: boolean } = {};
+
+        myFoods.forEach((food) => (myCheckedItems[food.foodId] = false));
+        setCheckedItems(myCheckedItems);
+      }
     }
   }, [orderData]);
 
-  // if(isODLoading)
-  //   return <Loading />;
-
-  if (isFoodLoading || isFoodTypeLoading) {
+  // Init code
+  if (isFoodLoading || isFoodTypeLoading || isTablesLoading) {
     return <Loading />;
   }
 
+  // Handle Functions
+
   // Ham them/chon food vao order
-  const addFood = (od: OnTableOrderDetail) => {
+  const processAddFood = (od: OnTableOrderDetail) => {
     let isNew = true;
 
+    // Kiem tra xem da ton tai mon y chang chua (bao gom note + variant)
     order.foods.forEach((food) => {
       if (
         food.foodId == od.foodId &&
@@ -117,16 +146,36 @@ const Order = () => {
       }
     });
 
-    if (isNew)
+    if (isNew) {
       setOrder(() => ({
         ...order,
         foods: [...order?.foods, od],
       }));
+
+      setCheckedItems({
+        ...checkedItems,
+        [od.foodId]: false,
+      });
+    }
+
+    // Neu don order da ton tai
+    if (order.orderId != "") {
+      const addFoodObject = {
+        tableId: tableId,
+        food: od,
+      };
+      addFoodIntoOrder(addFoodObject, {
+        onSuccess: () => toast.success("Add food successfully !!"),
+      });
+    }
   };
 
   // Ham xu ly dat mon
   const processOrder = (order: OnTableOrder) => {
-    if (order.foods.length == 0) return;
+    if (order.foods.length == 0) {
+      toast.error("You must choose at least one food");
+      return;
+    }
 
     const requestData = {
       seatId: tableId,
@@ -136,7 +185,14 @@ const Order = () => {
     } as CreateOrderRequest;
 
     createOrder(requestData, {
-      onSuccess: () => console.log(requestData),
+      onSuccess: (data) => {
+        setOrder(data);
+        toast.success("Order has been created!");
+      },
+      onError: (error) => {
+        console.log(error);
+        toast.error("This table is occupied");
+      },
     });
   };
 
@@ -151,9 +207,24 @@ const Order = () => {
         paymentMethod: 0,
       },
       {
-        onSuccess: () => console.log(tableId),
+        onSuccess: () => {
+          setOrder(emptyOrder);
+          setCheckedItems({});
+          toast.success("Payment successfull");
+        },
+        onError: () => toast.error("Payment fail"),
       }
     );
+  };
+
+  const processSelectAll = (isChecked: boolean) => {
+    let newCheckedItems: { [key: string]: boolean } = {};
+
+    Object.keys(checkedItems).forEach(
+      (foodId) => (newCheckedItems[foodId] = isChecked)
+    );
+
+    setCheckedItems(newCheckedItems);
   };
 
   return (
@@ -169,11 +240,11 @@ const Order = () => {
             </div>
             {/* FOODs PICKER */}
             <div className="grid grid-cols-4 gap-4  mt-4 overflow-y-auto max-h-[90vh] pr-1">
-              {foods.map((food) => (
+              {foods.map((food: Food) => (
                 <ProductCard
                   key={food.foodId}
                   food={food}
-                  onAddToCart={addFood}
+                  onAddToCart={processAddFood}
                 />
               ))}
             </div>
@@ -182,11 +253,51 @@ const Order = () => {
         {/* Order */}
         <div className="flex-[0_0_30%] max-w-[30%] ">
           <div className="bg-white rounded-lg p-4  ">
-            <h3 className="text-xl font-medium">Table {tableId}</h3>
-            <div className=" border-b border-gray-300 py-4 flex flex-col gap-3 ">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-medium">Table {tableId}</h3>
+            </div>
+            <div className="border-b border-gray-300 py-4 flex flex-col gap-3 ">
+              <div className="flex justify-between items-center">
+                <div>
+                  <input
+                    type="checkbox"
+                    name="selectAllFood"
+                    id="select_all_food"
+                    onChange={(e) => processSelectAll(e.target.checked)}
+                    checked={
+                      !Object.values(checkedItems).includes(false) &&
+                      Object.keys(checkedItems).length != 0
+                    }
+                  />
+                  <label htmlFor="select_all_food" className="ml-4">
+                    Select all
+                  </label>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Select
+                    defaultValue=""
+                    disabled={!Object.values(checkedItems).includes(true)}
+                  >
+                    <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black min-w-[100px]">
+                      <SelectValue placeholder="Move to ..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {tables.map((table: ITable) => (
+                        <SelectItem value={table.seatId}>
+                          {table.seatId}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div className="max-h-[400px] overflow-y-auto flex flex-col gap-3 pr-1">
                 {order?.foods.map((food) => (
-                  <OrderItem orderDetail={food} />
+                  <OrderItem
+                    orderDetail={food}
+                    checkedItems={checkedItems}
+                    setCheckedItems={setCheckedItems}
+                  />
                 ))}
               </div>
               {/* <div className="border-b border-gray-300 py-4">
@@ -220,19 +331,6 @@ const Order = () => {
                 )}
               </div>
               <div className="bg-[#f8fbf8] shadow rounded p-3 mt-2 flex flex-col">
-                {/* <div className="flex items-center justify-between pb-3 border-b border-gray-300">
-                  <span className="text-md font-medium">Order method</span>
-                  <Select defaultValue="dinein">
-                    <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black min-w-[100px]">
-                      <SelectValue placeholder="Chọn loại" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="dinein">Dine in</SelectItem>
-                      <SelectItem value="delivery">Delivery</SelectItem>
-                      <SelectItem value="takeaway">Take away</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div> */}
                 {/* <div className="flex items-center justify-between mt-2 px-2 text-sm">
                   <p className="font-medium">
                     Số bàn: <span className=" font-normal">Chưa chọn</span>
@@ -306,7 +404,7 @@ const Order = () => {
                 <span>{formatPriceToVND(order!.total)}</span>
               </div>
             </div>
-            {orderData == undefined ? (
+            {order.orderId == "" ? (
               <button
                 className="bg-[#ebc01c] py-2 text-black font-medium w-full rounded mt-4 cursor-pointer hover:opacity-60"
                 onClick={() => processOrder(order)}
@@ -324,6 +422,7 @@ const Order = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

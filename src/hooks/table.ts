@@ -1,9 +1,10 @@
+import TableStatus from "@/enum/tableStatus";
 import { getTables } from "@/services/tableService";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetTables = () => {
+export const useGetTables = (status?: TableStatus) => {
   return useQuery({
     queryKey: ["tables"],
-    queryFn: getTables,
+    queryFn: () => getTables(status),
   });
 };

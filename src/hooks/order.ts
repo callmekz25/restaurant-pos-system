@@ -1,6 +1,7 @@
 import CreateOrderRequest from '@/interfaces/order/createOrderRequest.interface';
 import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
 import {
+  addFoodIntoOrder,
   createOrder,
   getOrderByTableId,
   getOrders,
@@ -32,5 +33,11 @@ export const useCreateOrder = () => {
 export const usePayOrder = () => {
   return useMutation({
     mutationFn: (paymentObject: any) => payOrder(paymentObject),
+  });
+};
+
+export const useAddFood = () => {
+  return useMutation({
+    mutationFn: (addFoodObject: any) => addFoodIntoOrder(addFoodObject),
   });
 };

@@ -1,17 +1,18 @@
-import { ShoppingCartIcon, PlusIcon, MinusIcon } from 'lucide-react';
+import { ShoppingCartIcon, PlusIcon, MinusIcon } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from '../../components/ui/dialog';
-import Food from '@/interfaces/food/food.interface';
-import { useState } from 'react';
-import OnTableOrderDetail from '@/interfaces/order/onTableOrderDetail.interface';
+} from "../../components/ui/dialog";
+import Food from "@/interfaces/food/food.interface";
+import { useState } from "react";
+import OnTableOrderDetail from "@/interfaces/order/onTableOrderDetail.interface";
+import formatPriceToVND from "@/utils/formatPriceToVND";
 const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
   const [amount, setAmount] = useState<number>(1);
-  const [note, setNote] = useState<string>('');
+  const [note, setNote] = useState<string>("");
 
   return (
     <div className=" rounded-md overflow-hidden border border-gray-200 shadow flex flex-col flex-1">
@@ -24,7 +25,7 @@ const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
         <h3 className="text-md font-medium line-clamp-1">{food.foodName}</h3>
         <div className="flex items-center justify-between mt-1.5">
           <span className=" font-medium text-sm">
-            {food.price.toLocaleString()} vnd
+            {formatPriceToVND(food.price)}
           </span>
           <Dialog>
             <DialogTrigger asChild>
@@ -46,9 +47,9 @@ const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
               <div className="flex-[0_0_50%] ml-3 max-w-[50%] pr-5">
                 <h3 className="text-2xl font-semibold">{food.foodName}</h3>
                 <p className="mt-3 font-normal text-lg">
-                  Price:{' '}
+                  Price:{" "}
                   <span className="font-semibold">
-                    {food.price.toLocaleString()} vnd
+                    {formatPriceToVND(food.price)}
                   </span>
                 </p>
                 <div className="flex flex-col mt-6 gap-4">
@@ -132,8 +133,8 @@ const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
                         amount: amount,
                         note: note,
                         actualPrice: amount * food.price,
-                        variantId: '',
-                        variantName: '',
+                        variantId: "",
+                        variantName: "",
                       } as OnTableOrderDetail)
                     }
                   >

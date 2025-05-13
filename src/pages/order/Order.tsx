@@ -1,4 +1,4 @@
-import Carousel from "@/components/ui/carousel";
+import CategoryCarousel from "@/components/ui/categoryCarousel";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ProductCard from "@/components/ui/productCard";
@@ -38,6 +38,7 @@ import { useGetFoodTypes } from "@/hooks/foodType";
 import OnTableOrderDetail from "@/interfaces/order/onTableOrderDetail.interface";
 import PaymentMethod from "@/enum/paymentMethod";
 import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface";
+import formatPriceToVND from "@/utils/formatPriceToVND";
 
 const Order = () => {
   const { tableId } = useParams();
@@ -160,7 +161,7 @@ const Order = () => {
       <div className="flex gap-5">
         <div className="flex-[0_0_70%] max-w-[70%] ">
           {/* CATEGORIES  */}
-          <Carousel foodTypes={foodTypes} />
+          <CategoryCarousel foodTypes={foodTypes} />
           <div className="mt-4">
             <div className="flex items-center  justify-between">
               <h3 className="text-lg font-medium">Food List</h3>
@@ -302,7 +303,7 @@ const Order = () => {
               </div>
               <div className="flex font-medium text-lg items-center justify-between">
                 <span>Total: </span>
-                <span>{order!.total.toLocaleString()} vnd</span>
+                <span>{formatPriceToVND(order!.total)}</span>
               </div>
             </div>
             {orderData == undefined ? (

@@ -9,9 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import formatDate from "@/utils/formatDate";
+
 import getDaysByMonthYear from "@/utils/getDaysByMonthYear";
-import TimeKeepingModal from "@/components/modal/timeKeeping.modal";
+import markTimeSheet from "@/utils/markTimeSheet";
+import TimeSheetModal from "@/components/modal/timeSheet.modal";
+import IGroupTimeSheet from "@/interfaces/timesheet/groupTimeSheet.interface";
+import ITimeSheetEntry from "@/interfaces/timesheet/timeSheetEntry.interface";
 import ITimeSheet from "@/interfaces/timesheet/timeSheet.interface";
 
 const TimeSheet = () => {
@@ -20,47 +23,59 @@ const TimeSheet = () => {
   const [year, setYear] = useState("2025");
   const [groupData, setGroupData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [selectEmp, setSelectEmp] = useState({});
-  const { data, isLoading, error } = useGetTimeSheetByMonth(month, year);
+  const [selectTimeSheet, setSelectTimeSheet] = useState({});
+  const { data, isLoading, error, refetch } = useGetTimeSheetByMonth(
+    month,
+    year
+  );
+
   const { mutate, isPending } = useInitTimeSheet();
   useEffect(() => {
     if (!isLoading && data.length === 0 && !error) {
       mutate(undefined, {
-        onSuccess: () => console.log("Init Success!"),
+        onSuccess: () => {
+          console.log("Init Success!");
+          refetch();
+        },
       });
     }
-  }, [data, isLoading, error, mutate]);
+  }, [data, isLoading, error, mutate, refetch]);
   useEffect(() => {
     if (data && data.length > 0) {
-      const result = data.reduce((acc, curr) => {
-        const found = acc.find((item: ITimeSheet) => item.empId === curr.empId);
+      const result = data.reduce((acc: IGroupTimeSheet[], curr: ITimeSheet) => {
+        const found = acc.find((item) => item.empId === curr.empId);
+
+        const timeSheetEntry: ITimeSheetEntry = {
+          workingDate: curr.workingDate,
+          workingHours: curr.workingHours,
+          workShiftId: curr.workShiftId,
+          overtimeWorkingHours: curr.overtimeWorkingHours,
+          status: curr.status,
+        };
+
         if (found) {
-          found.workingDate.push(curr.workingDate);
-          found.workingHours.push(curr.workingHours);
-          found.workShiftId.push(curr.workShiftId);
-          found.overtimeWorkingHours.push(curr.overtimeWorkingHours);
+          found.timesheets.push(timeSheetEntry);
         } else {
           acc.push({
             empId: curr.empId,
             empName: curr.empName,
             empTypeName: curr.empTypeName,
-            workingDate: [curr.workingDate],
-            workingHours: [curr.workingHours],
-            workShiftId: [curr.workShiftId],
-            overtimeWorkingHours: [curr.overtimeWorkingHours],
+            timesheets: [timeSheetEntry],
           });
         }
+
         return acc;
       }, []);
+
       setGroupData(result);
     } else {
       setGroupData([]);
     }
   }, [data]);
 
-  const handleOpenTimeKeepingModal = (emp: ITimeSheet) => {
+  const handleOpenTimeSheetModal = (ts: IGroupTimeSheet, index: number) => {
     setOpenModal(true);
-    setSelectEmp(emp);
+    setSelectTimeSheet({ ...ts, index: index });
   };
 
   if (isLoading || isPending) {
@@ -147,58 +162,48 @@ const TimeSheet = () => {
 
           <tbody>
             {groupData.length > 0 &&
-              groupData.map((emp: ITimeSheet, index) => (
+              groupData.map((ts: IGroupTimeSheet, index) => (
                 <tr key={index}>
-                  <td className="border  border-gray-400 py-2 ">{index + 1}</td>
-                  <td className="border  border-gray-400     text-left pl-1">
-                    {emp.empName}
+                  <td className="border border-gray-400 py-2">{index + 1}</td>
+                  <td className="border border-gray-400 text-left pl-1">
+                    {ts.empName}
                   </td>
-                  <td className="border  border-gray-400 ">
-                    {emp.empTypeName}
-                  </td>
-                  {days.map((_, i) => (
-                    <td
-                      onClick={() => handleOpenTimeKeepingModal(emp)}
-                      key={i}
-                      className={`border border-gray-400 cursor-pointer ${
-                        emp.workingDate.some(
-                          (w: Date[]) => getDayFromDate(w) === i + 1
-                        ) && emp.workingHours[i + 1] > 0
-                          ? emp.workShiftId[i + 1] === "F1"
-                            ? "bg-blue-300"
-                            : "bg-orange-300"
-                          : "bg-red-300"
-                      }`}
-                    >
-                      {emp.workingDate.some(
-                        (w: Date[]) => getDayFromDate(w) === i + 1
-                      ) && emp.workingHours[i + 1] > 0
-                        ? emp.workShiftId[i + 1]
-                        : "X"}
-                    </td>
-                  ))}
+                  <td className="border border-gray-400">{ts.empTypeName}</td>
+
+                  {days.map((_, i) => {
+                    const shift = markTimeSheet(ts, i + 1);
+                    let bgColor = "";
+
+                    if (shift === "X") {
+                      bgColor = "bg-red-300";
+                    } else if (shift === "F1") {
+                      bgColor = "bg-blue-300";
+                    } else if (shift) {
+                      bgColor = "bg-orange-300";
+                    }
+
+                    return (
+                      <td
+                        key={i}
+                        onClick={() => handleOpenTimeSheetModal(ts, i)}
+                        className={`border border-gray-400 cursor-pointer ${bgColor}`}
+                      >
+                        {shift}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
-
-            <tr>
-              <td
-                className="border py-1  border-gray-400 text-center"
-                colSpan={3}
-              >
-                Total
-              </td>
-              {days.map((_, i) => (
-                <td key={i} className="border  border-gray-400"></td>
-              ))}
-            </tr>
           </tbody>
         </table>
       </div>
-      <TimeKeepingModal
-        open={openModal}
-        onOpenchange={setOpenModal}
-        emp={selectEmp}
-      />
+      {openModal && (
+        <TimeSheetModal
+          open={openModal}
+          onOpenchange={setOpenModal}
+          ts={selectTimeSheet}
+        />
+      )}
     </div>
   );
 };

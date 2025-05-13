@@ -4,6 +4,7 @@ import {
   createOrder,
   getOrderByTableId,
   getOrders,
+  payOrder,
 } from '@/services/orderService';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -17,12 +18,19 @@ export const useGetOrders = () => {
 export const useGetOrderByTableId = (tableId: string) => {
   return useQuery({
     queryKey: ['orders', tableId],
-    queryFn: () => getOrderByTableId(tableId),
+    queryFn: () => getOrderByTableId(tableId),    
+    enabled: !!tableId
   });
 };
 
 export const useCreateOrder = () => {
   return useMutation({
     mutationFn: (createOrderRequest: CreateOrderRequest) => createOrder(createOrderRequest),
+  });
+};
+
+export const usePayOrder = () => {
+  return useMutation({
+    mutationFn: (paymentObject: any) => payOrder(paymentObject),
   });
 };

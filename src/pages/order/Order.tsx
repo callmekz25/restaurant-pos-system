@@ -1,51 +1,55 @@
-import Carousel from '@/components/ui/carousel';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import ProductCard from '@/components/ui/productCard';
-import { PenBoxIcon } from 'lucide-react';
-import ITable from '@/interfaces/table/table.interface';
+import Carousel from "@/components/ui/carousel";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import ProductCard from "@/components/ui/productCard";
+import { PenBoxIcon } from "lucide-react";
+import ITable from "@/interfaces/table/table.interface";
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from '../../components/ui/dialog';
-import Table from '@/components/table/Table';
+} from "../../components/ui/dialog";
+import Table from "@/components/table/Table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import OrderItem from '@/components/order/OrderItem';
-import { useEffect, useState } from 'react';
-import STATUS_TABLE from '@/constants/status.table';
-import { useGetTables } from '@/hooks/table';
-import Loading from '@/components/ui/loading';
-import { useParams } from 'react-router-dom';
-import { useCreateOrder, useGetOrderByTableId } from '@/hooks/order';
-import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
-import { useGetFoods } from '@/hooks/food';
-import Food from '@/interfaces/food/food.interface';
-import FoodType from '@/interfaces/food/foodType.interface';
-import { useGetFoodTypes } from '@/hooks/foodType';
-import OnTableOrderDetail from '@/interfaces/order/onTableOrderDetail.interface';
-import PaymentMethod from '@/enum/paymentMethod';
-import CreateOrderRequest from '@/interfaces/order/createOrderRequest.interface';
+} from "@/components/ui/select";
+import OrderItem from "@/components/order/OrderItem";
+import { useEffect, useState } from "react";
+import STATUS_TABLE from "@/constants/status.table";
+import { useGetTables } from "@/hooks/table";
+import Loading from "@/components/ui/loading";
+import { useParams } from "react-router-dom";
+import {
+  useCreateOrder,
+  useGetOrderByTableId,
+  usePayOrder,
+} from "@/hooks/order";
+import OnTableOrder from "@/interfaces/order/onTableOrder.interface";
+import { useGetFoods } from "@/hooks/food";
+import Food from "@/interfaces/food/food.interface";
+import FoodType from "@/interfaces/food/foodType.interface";
+import { useGetFoodTypes } from "@/hooks/foodType";
+import OnTableOrderDetail from "@/interfaces/order/onTableOrderDetail.interface";
+import PaymentMethod from "@/enum/paymentMethod";
+import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface";
 
 const Order = () => {
   const { tableId } = useParams();
   const [noteWriting, setNoteWriting] = useState<boolean>(false);
-  const [note, setNote] = useState<string>('');
+  const [note, setNote] = useState<string>("");
   const [order, setOrder] = useState<OnTableOrder>({
-    orderId: '',
-    seatId: tableId ?? '',
-    serverId: 'EMP001',
+    orderId: "",
+    seatId: tableId ?? "",
+    serverId: "EMP001",
     timeIn: new Date(),
     foods: [] as OnTableOrderDetail[],
-    note: '',
+    note: "",
     discount: 0,
     surcharge: 0,
     paymentMethod: PaymentMethod.CASH,
@@ -53,6 +57,7 @@ const Order = () => {
   });
 
   const { mutate: createOrder, isPending } = useCreateOrder();
+  const { mutate: payOrder, isPending: isPayPending } = usePayOrder();
 
   const {
     data: foodsData,
@@ -73,7 +78,7 @@ const Order = () => {
     data: orderData,
     isLoading: isODLoading,
     error: orderDetailError,
-  } = useGetOrderByTableId(tableId ?? '');
+  } = useGetOrderByTableId(tableId!);
 
   useEffect(() => {
     if (orderData != undefined) {
@@ -120,6 +125,8 @@ const Order = () => {
 
   // Ham xu ly dat mon
   const processOrder = (order: OnTableOrder) => {
+    if (order.foods.length == 0) return;
+
     const requestData = {
       seatId: tableId,
       serverId: order.serverId,
@@ -127,11 +134,25 @@ const Order = () => {
       foods: order.foods,
     } as CreateOrderRequest;
 
-    console.log(requestData);
-
     createOrder(requestData, {
       onSuccess: () => console.log(requestData),
     });
+  };
+
+  // Ham xu ly thanh toan
+  const processPayment = (tableId: string) => {
+    payOrder(
+      {
+        tableId: tableId,
+        cashierId: "EMP001",
+        discount: 0.2,
+        surcharge: 20000,
+        paymentMethod: 0,
+      },
+      {
+        onSuccess: () => console.log(tableId),
+      }
+    );
   };
 
   return (
@@ -183,7 +204,7 @@ const Order = () => {
                 </div>
                 {!noteWriting ? (
                   <p className="text-[13px] mt-2 text-gray-500">
-                    {note == '' ? 'Chưa có ghi chú nào' : note}
+                    {note == "" ? "Chưa có ghi chú nào" : note}
                   </p>
                 ) : (
                   <textarea
@@ -284,12 +305,21 @@ const Order = () => {
                 <span>{order!.total.toLocaleString()} vnd</span>
               </div>
             </div>
-            <button
-              className="bg-[#ebc01c] py-2 text-black font-medium w-full rounded mt-4 cursor-pointer hover:opacity-60"
-              onClick={() => processOrder(order)}
-            >
-              Process Order
-            </button>
+            {orderData == undefined ? (
+              <button
+                className="bg-[#ebc01c] py-2 text-black font-medium w-full rounded mt-4 cursor-pointer hover:opacity-60"
+                onClick={() => processOrder(order)}
+              >
+                Process Order
+              </button>
+            ) : (
+              <button
+                className="bg-[#ebc01c] py-2 text-black font-medium w-full rounded mt-4 cursor-pointer hover:opacity-60"
+                onClick={() => processPayment(tableId!)}
+              >
+                Pay Order
+              </button>
+            )}
           </div>
         </div>
       </div>

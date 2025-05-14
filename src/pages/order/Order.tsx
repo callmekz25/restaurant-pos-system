@@ -29,6 +29,7 @@ import {
   useAddFood,
   useCreateOrder,
   useGetOrderByTableId,
+  useMoveFoods,
   usePayOrder,
 } from "@/hooks/order";
 import OnTableOrder from "@/interfaces/order/onTableOrder.interface";
@@ -42,6 +43,7 @@ import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface"
 import formatPriceToVND from "@/utils/formatPriceToVND";
 import { ToastContainer, toast } from "react-toastify";
 import TableStatus from "@/enum/tableStatus";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Order = () => {
   // useParam
@@ -52,12 +54,7 @@ const Order = () => {
   const { mutate: payOrder, isPending: isPayPending } = usePayOrder();
   const { mutate: addFoodIntoOrder, isPending: isAddFoodPending } =
     useAddFood();
-
-  const {
-    data: orderData,
-    isLoading: isODLoading,
-    error: orderDetailError,
-  } = useGetOrderByTableId(tableId!);
+  const { mutate: moveFoods, isPending: isMoveFoodsPending } = useMoveFoods();
 
   // useQuery
   const {
@@ -79,6 +76,12 @@ const Order = () => {
     refetch: refechTables,
   } = useGetTables(TableStatus.AVAILABLE);
 
+  const {
+    data: orderData,
+    isLoading: isODLoading,
+    error: orderDetailError,
+  } = useGetOrderByTableId(tableId!);
+
   // Params
   const emptyOrder = {
     orderId: "",
@@ -93,18 +96,20 @@ const Order = () => {
     total: 0,
   } as OnTableOrder;
 
+  const queryClient = useQueryClient();
+
   // States
   const [noteWriting, setNoteWriting] = useState<boolean>(false);
-  const [note, setNote] = useState<string>("");
   const [order, setOrder] = useState<OnTableOrder>(emptyOrder);
-  const [checkedItems, setCheckedItems] = useState({});
+  const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   // useEffect
 
   useEffect(() => {
     if (orderData != undefined) {
       setOrder(orderData);
-      setNote(orderData.note);
 
       if (Object.keys(checkedItems).length == 0) {
         let myFoods = orderData.foods as Food[];
@@ -115,6 +120,18 @@ const Order = () => {
       }
     }
   }, [orderData]);
+
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["tables", "ALL"],
+    });
+
+    queryClient.invalidateQueries({
+      queryKey: ["tables", "AVAILABLE"],
+    });
+
+    console.log(order);
+  }, [order]);
 
   // Init code
   if (isFoodLoading || isFoodTypeLoading || isTablesLoading) {
@@ -146,6 +163,7 @@ const Order = () => {
       }
     });
 
+    // Neu san pham do chua ton tai
     if (isNew) {
       setOrder(() => ({
         ...order,
@@ -160,14 +178,55 @@ const Order = () => {
 
     // Neu don order da ton tai
     if (order.orderId != "") {
-      const addFoodObject = {
-        tableId: tableId,
-        food: od,
-      };
-      addFoodIntoOrder(addFoodObject, {
-        onSuccess: () => toast.success("Add food successfully !!"),
-      });
+      addFoodIntoOrder(
+        {
+          tableId: tableId,
+          food: od,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Add food successfully !!");
+          },
+        }
+      );
     }
+  };
+
+  const processMoveFoods = (changeTableId: string) => {
+    let foods: [{ foodId: string }?] = [];
+
+    Object.keys(checkedItems).forEach((foodId) => {
+      if (checkedItems[foodId]) {
+        const currentFood = order.foods.find((food) => food.foodId == foodId);
+        foods.push(currentFood);
+
+        setOrder(() => ({
+          ...order,
+          foods: order.foods.filter((food) => food.foodId != foodId),
+        }));
+      }
+
+      // queryClient.invalidateQueries({
+      //   queryKey: ["order", tableId],
+      // });
+    });
+
+    moveFoods(
+      {
+        tableId: tableId,
+        requestData: {
+          foods: foods,
+          changedSeatId: changeTableId,
+          serverId: "EMP001",
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("Move foods successfully !!!");
+        },
+        onError: () => toast.error("Move foods fail !!!"),
+      }
+    );
   };
 
   // Ham xu ly dat mon
@@ -180,7 +239,7 @@ const Order = () => {
     const requestData = {
       seatId: tableId,
       serverId: order.serverId,
-      note: note,
+      note: order.note,
       foods: order.foods,
     } as CreateOrderRequest;
 
@@ -277,6 +336,7 @@ const Order = () => {
                   <Select
                     defaultValue=""
                     disabled={!Object.values(checkedItems).includes(true)}
+                    onValueChange={(value) => processMoveFoods(value)}
                   >
                     <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black min-w-[100px]">
                       <SelectValue placeholder="Move to ..." />
@@ -316,7 +376,7 @@ const Order = () => {
                 </div>
                 {!noteWriting ? (
                   <p className="text-[13px] mt-2 text-gray-500">
-                    {note == "" ? "Chưa có ghi chú nào" : note}
+                    {order.note == "" ? "Chưa có ghi chú nào" : order.note}
                   </p>
                 ) : (
                   <textarea
@@ -324,9 +384,11 @@ const Order = () => {
                     className="outline-none border border-gray-300 rounded p-2 resize-none mt-2 text-[13px] placeholder:text-[13px] min-h-[80px] transition-all duration-300 focus:border-blue-600"
                     placeholder="Thêm ghi chú cho đơn hàng..."
                     id="note"
-                    defaultValue={note}
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
+                    defaultValue={order.note}
+                    value={order.note}
+                    onChange={(e) =>
+                      setOrder({ ...order, note: e.target.value })
+                    }
                   ></textarea>
                 )}
               </div>

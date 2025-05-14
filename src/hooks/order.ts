@@ -5,6 +5,7 @@ import {
   createOrder,
   getOrderByTableId,
   getOrders,
+  moveFoods,
   payOrder,
 } from '@/services/orderService';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -18,7 +19,7 @@ export const useGetOrders = () => {
 
 export const useGetOrderByTableId = (tableId: string) => {
   return useQuery({
-    queryKey: ['orders', tableId],
+    queryKey: ['order', tableId],
     queryFn: () => getOrderByTableId(tableId),    
     enabled: !!tableId
   });
@@ -39,5 +40,11 @@ export const usePayOrder = () => {
 export const useAddFood = () => {
   return useMutation({
     mutationFn: (addFoodObject: any) => addFoodIntoOrder(addFoodObject),
+  });
+};
+
+export const useMoveFoods = () => {
+  return useMutation({
+    mutationFn: (MoveFoodsObject: any) => moveFoods(MoveFoodsObject),
   });
 };

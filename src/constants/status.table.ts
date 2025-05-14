@@ -1,19 +1,25 @@
+import TableStatus from "@/enum/tableStatus";
+
 const STATUS_TABLE = [
   {
-    status: "Available",
+    status: TableStatus.AVAILABLE,
     color: "#10b58b",
+    isChecked: true,
   },
   {
-    status: "Reserved",
+    status: TableStatus.RESERVED,
     color: "#d94f51",
+    isChecked: true,
   },
   {
-    status: "Occupied",
+    status: TableStatus.OCCUPIED,
     color: "#14a5df",
+    isChecked: true,
   },
   {
-    status: "Unavailable",
+    status: TableStatus.UNAVAILABLE,
     color: "#717075",
+    isChecked: false,
   },
-];
+] as { status: TableStatus; color: string; isChecked: boolean }[];
 export default STATUS_TABLE;

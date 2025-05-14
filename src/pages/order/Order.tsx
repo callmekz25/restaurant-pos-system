@@ -100,7 +100,6 @@ const Order = () => {
 
   // States
   const [noteWriting, setNoteWriting] = useState<boolean>(false);
-  const [note, setNote] = useState<string>("");
   const [order, setOrder] = useState<OnTableOrder>(emptyOrder);
   const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>(
     {}
@@ -111,7 +110,6 @@ const Order = () => {
   useEffect(() => {
     if (orderData != undefined) {
       setOrder(orderData);
-      setNote(orderData.note);
 
       if (Object.keys(checkedItems).length == 0) {
         let myFoods = orderData.foods as Food[];
@@ -241,7 +239,7 @@ const Order = () => {
     const requestData = {
       seatId: tableId,
       serverId: order.serverId,
-      note: note,
+      note: order.note,
       foods: order.foods,
     } as CreateOrderRequest;
 
@@ -271,7 +269,6 @@ const Order = () => {
         onSuccess: () => {
           setOrder(emptyOrder);
           setCheckedItems({});
-          setNote("");
           toast.success("Payment successfull");
         },
         onError: () => toast.error("Payment fail"),
@@ -379,7 +376,7 @@ const Order = () => {
                 </div>
                 {!noteWriting ? (
                   <p className="text-[13px] mt-2 text-gray-500">
-                    {note == "" ? "Chưa có ghi chú nào" : note}
+                    {order.note == "" ? "Chưa có ghi chú nào" : order.note}
                   </p>
                 ) : (
                   <textarea
@@ -387,9 +384,11 @@ const Order = () => {
                     className="outline-none border border-gray-300 rounded p-2 resize-none mt-2 text-[13px] placeholder:text-[13px] min-h-[80px] transition-all duration-300 focus:border-blue-600"
                     placeholder="Thêm ghi chú cho đơn hàng..."
                     id="note"
-                    defaultValue={note}
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
+                    defaultValue={order.note}
+                    value={order.note}
+                    onChange={(e) =>
+                      setOrder({ ...order, note: e.target.value })
+                    }
                   ></textarea>
                 )}
               </div>

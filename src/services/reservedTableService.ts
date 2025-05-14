@@ -5,7 +5,7 @@ export const getReservedTables = async () => {
   try {
     const { data } = await httpRequest.get(`/booked-seats`);
 
-    return data;
+    return data.reverse();
   } catch (error) {
     console.log(error);
   }

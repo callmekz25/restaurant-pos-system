@@ -53,9 +53,9 @@ const ReservedTable = () => {
     createReservedTable(requestData, {
       onSuccess: () => {
         toast.success("Create reserved table successfully !!!");
-        // queryClient.invalidateQueries({
-        //   queryKey: ["reserved-tables"],
-        // });
+        queryClient.invalidateQueries({
+          queryKey: ["reserved-tables"],
+        });
       },
       onError: (error) => {
         console.log(error);
@@ -159,8 +159,9 @@ const ReservedTable = () => {
       <div className="px-2 mt-10">
         <div className="bg-white rounded-md p-4 h-full border">
           <h3 className="text-lg font-semibold">Table Reservation Histories</h3>
-          <div className="flex flex-col mt-4 gap-4">
-            <div className="flex justify-between">
+          <div className="flex flex-col mt-4 gap-5">
+            {/* TITLE ROW  */}
+            <div className="flex justify-between items-center border-b-2 py-2 px-4">
               <div className="flex-1 font-bold">Time</div>
               <div className="flex-1 font-bold">Date</div>
               <div className="flex-1 font-bold">Name</div>
@@ -169,16 +170,16 @@ const ReservedTable = () => {
               <div className="flex-1 font-bold">Table</div>
               <div className="flex-1"></div>
             </div>
-            <hr className="mb-5"></hr>
             {reservedTables.map((rt: IReservedTable) => (
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center px-2 py-4 hover:opacity-90 hover:bg-gray-200">
                 <div className="flex-1">
                   <span className="py-2 px-4 outline-1 outline-red-400 text-red-400">
                     {formatTime(new Date(rt.bookedTime!))}
                   </span>
                 </div>
                 <div className="flex-1">
-                  {new Date(rt.bookedTime!) == new Date() ? (
+                  {new Date(rt.bookedTime!).getDate() ==
+                  new Date().getDate() ? (
                     <span className="py-2 px-4 bg-red-400 rounded-4xl">
                       Today
                     </span>

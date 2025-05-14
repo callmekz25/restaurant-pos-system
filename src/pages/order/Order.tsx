@@ -74,7 +74,9 @@ const Order = () => {
     isLoading: isTablesLoading,
     error: tableError,
     refetch: refechTables,
-  } = useGetTables(TableStatus.AVAILABLE);
+  } = useGetTables([
+    { status: TableStatus.AVAILABLE, color: "", isChecked: true },
+  ]);
 
   const {
     data: orderData,
@@ -121,17 +123,17 @@ const Order = () => {
     }
   }, [orderData]);
 
-  useEffect(() => {
-    queryClient.invalidateQueries({
-      queryKey: ["tables", "ALL"],
-    });
+  // useEffect(() => {
+  //   queryClient.invalidateQueries({
+  //     queryKey: ["tables", "ALL"],
+  //   });
 
-    queryClient.invalidateQueries({
-      queryKey: ["tables", "AVAILABLE"],
-    });
+  //   queryClient.invalidateQueries({
+  //     queryKey: ["tables", "AVAILABLE"],
+  //   });
 
-    console.log(order);
-  }, [order]);
+  //   console.log(order);
+  // }, [order]);
 
   // Init code
   if (isFoodLoading || isFoodTypeLoading || isTablesLoading) {

@@ -6,6 +6,7 @@ import TableStatus from "@/enum/tableStatus";
 import { useGetTables } from "@/hooks/table";
 import ITable from "@/interfaces/table/table.interface";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 const TableList = () => {
   // States
   const [tables, setTables] =
@@ -31,9 +32,12 @@ const TableList = () => {
       <div className="flex items-center justify-between">
         <h3 className="text-2xl  font-semibold">Tables</h3>
         <div>
-          <button className="bg-red-500 py-2 px-4 rounded-2xl hover:opacity-80 cursor-pointer">
-            Đặt bàn
-          </button>
+          <Link
+            to={"/serving/orders/tables/reverse-table"}
+            className="bg-red-500 py-2 px-4 rounded-2xl hover:opacity-80 cursor-pointer"
+          >
+            Reverse table
+          </Link>
         </div>
         <div className="flex items-center gap-10">
           {tables.map((st) => {

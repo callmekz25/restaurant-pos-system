@@ -7,47 +7,105 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetReservedTables } from "@/hooks/reservedTable";
+import { useCreateReservedTable } from "@/hooks/table";
 import IReservedTable from "@/interfaces/table/reservedTable.interface";
+import toDatetimeLocalString from "@/utils/DateToISOString";
 import formatDate from "@/utils/formatDate";
 import formatTime from "@/utils/formatTime";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 const ReservedTable = () => {
+  // Params
+  const initReservedTable = {
+    bookedSeatId: "",
+    customerFullName: "",
+    orderId: "",
+    customerPhone: "",
+    seatId: "",
+    bookedTime: undefined,
+    createdAt: undefined,
+    slots: undefined,
+  };
+
+  const queryClient = useQueryClient();
+
+  // States
+  const [reservedTable, setReservedTable] =
+    useState<IReservedTable>(initReservedTable);
+
+  // useQuery
   const {
     data: reservedTables,
     isLoading: isRTLoading,
     isError: isRTError,
   } = useGetReservedTables();
 
+  // useMutation
+  const { mutate: createReservedTable } = useCreateReservedTable();
+
   if (isRTLoading) {
     return <Loading></Loading>;
   }
 
-  console.log(reservedTables);
+  const processCreateRT = (requestData: IReservedTable) => {
+    createReservedTable(requestData, {
+      onSuccess: () => {
+        toast.success("Create reserved table successfully !!!");
+        // queryClient.invalidateQueries({
+        //   queryKey: ["reserved-tables"],
+        // });
+      },
+      onError: (error) => {
+        console.log(error);
+        toast.error("Create reserved table fail !!!");
+      },
+    });
+  };
 
   return (
     <>
       <div className="px-2 mt-5  ">
         <div className="bg-white rounded-md p-4 h-full border">
           <h3 className="text-lg font-semibold">Create A Reservation</h3>
-          <form className="flex flex-col mt-4 gap-5">
+          <div className="flex flex-col mt-4 gap-5">
             <div className="flex justify-between items-center gap-5">
               <input
                 type="text"
                 className="p-2 flex-4 border-b-2"
                 placeholder="Customer Name"
-                name="customerFullName"
+                value={reservedTable.customerFullName}
+                onChange={(e) =>
+                  setReservedTable({
+                    ...reservedTable,
+                    customerFullName: e.target.value,
+                  })
+                }
               ></input>
               <input
                 type="text"
                 className="p-2 flex-3 border-b-2"
                 placeholder="Customer Phone"
-                name="customerPhone"
+                value={reservedTable.customerPhone}
+                onChange={(e) =>
+                  setReservedTable({
+                    ...reservedTable,
+                    customerPhone: e.target.value,
+                  })
+                }
               ></input>
               <input
                 type="number"
                 className="p-2 flex-1 border-b-2"
                 placeholder="Customer Slots"
-                name="customerPhone"
+                value={reservedTable.slots}
+                onChange={(e) =>
+                  setReservedTable({
+                    ...reservedTable,
+                    slots: Number(e.target.value),
+                  })
+                }
               ></input>
             </div>
             <div className="flex justify-baseline items-center gap-5">
@@ -55,14 +113,18 @@ const ReservedTable = () => {
                 type="datetime-local"
                 className="p-2 border-b-2"
                 placeholder="Reserved Time"
-                name="customerFullName"
-              ></input>
-              <input
-                type="text"
-                className="p-2"
-                placeholder=""
-                name="customerPhone"
-                hidden={true}
+                value={
+                  reservedTable.bookedTime != undefined
+                    ? toDatetimeLocalString(new Date(reservedTable.bookedTime!))
+                    : undefined
+                }
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setReservedTable({
+                    ...reservedTable,
+                    bookedTime: new Date(e.target.value),
+                  });
+                }}
               ></input>
               <Select defaultValue="">
                 <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black min-w-[100px]">
@@ -76,16 +138,24 @@ const ReservedTable = () => {
               </Select>
             </div>
             <div className="flex justify-end items-center mt-5">
-              <button className="mr-10 py-2 px-4 bg-gray-300 rounded-2xl cursor-pointer hover:opacity-80">
+              <button
+                className="mr-10 py-2 px-4 bg-gray-300 rounded-2xl cursor-pointer hover:opacity-80"
+                onClick={() => setReservedTable(initReservedTable)}
+              >
                 Clear
               </button>
-              <button className="py-2 px-4 bg-green-600 rounded-2xl cursor-pointer hover:opacity-80">
+              <button
+                className="py-2 px-4 bg-green-600 rounded-2xl cursor-pointer hover:opacity-80"
+                onClick={() => processCreateRT(reservedTable)}
+              >
                 Save
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
+
+      {/* RESERVED TABLE HISTORIES  */}
       <div className="px-2 mt-10">
         <div className="bg-white rounded-md p-4 h-full border">
           <h3 className="text-lg font-semibold">Table Reservation Histories</h3>
@@ -100,30 +170,28 @@ const ReservedTable = () => {
               <div className="flex-1"></div>
             </div>
             <hr className="mb-5"></hr>
-            {reservedTables.map((reservedTable: IReservedTable) => (
+            {reservedTables.map((rt: IReservedTable) => (
               <div className="flex justify-between">
                 <div className="flex-1">
                   <span className="py-2 px-4 outline-1 outline-red-400 text-red-400">
-                    {formatTime(new Date(reservedTable.bookedTime))}
+                    {formatTime(new Date(rt.bookedTime!))}
                   </span>
                 </div>
                 <div className="flex-1">
-                  {new Date(reservedTable.bookedTime) == new Date() ? (
+                  {new Date(rt.bookedTime!) == new Date() ? (
                     <span className="py-2 px-4 bg-red-400 rounded-4xl">
                       Today
                     </span>
                   ) : (
                     <span className="py-2 px-4 bg-gray-400 rounded-4xl">
-                      {formatDate(new Date(reservedTable.bookedTime))}
+                      {formatDate(new Date(rt.bookedTime!))}
                     </span>
                   )}
                 </div>
-                <div className="flex-1">{reservedTable.customerFullName}</div>
-                <div className="flex-1">{reservedTable.customerPhone}</div>
-                <div className="flex-1">{reservedTable.slots}</div>
-                <div className="flex-1">
-                  {reservedTable.seatId ?? "No picked table"}
-                </div>
+                <div className="flex-1">{rt.customerFullName}</div>
+                <div className="flex-1">{rt.customerPhone}</div>
+                <div className="flex-1">{rt.slots}</div>
+                <div className="flex-1">{rt.seatId ?? "No picked table"}</div>
                 <div className="flex-1">
                   <button className="cursor-pointer bg-blue-500 px-3 py-1 rounded-2xl hover:opacity-80">
                     View detail
@@ -133,6 +201,7 @@ const ReservedTable = () => {
             ))}
           </div>
         </div>
+        <ToastContainer />
       </div>
     </>
   );

@@ -16,20 +16,23 @@ import TimeSheetModal from "@/components/modal/timeSheet.modal";
 import IGroupTimeSheet from "@/interfaces/timesheet/groupTimeSheet.interface";
 import ITimeSheetEntry from "@/interfaces/timesheet/timeSheetEntry.interface";
 import ITimeSheet from "@/interfaces/timesheet/timeSheet.interface";
-
+interface Ts extends IGroupTimeSheet {
+  index: number;
+}
 const TimeSheet = () => {
   const days = getDaysByMonthYear(6, 2025);
   const [month, setMonth] = useState("MAY");
   const [year, setYear] = useState("2025");
   const [groupData, setGroupData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [selectTimeSheet, setSelectTimeSheet] = useState({});
+  const [selectTimeSheet, setSelectTimeSheet] = useState<Ts | null>(null);
   const { data, isLoading, error, refetch } = useGetTimeSheetByMonth(
     month,
     year
   );
 
   const { mutate, isPending } = useInitTimeSheet();
+  // Kiểm tra có time sheet tháng năm hiện tại có trong db, chưa thì khởi tạo và refetch lại
   useEffect(() => {
     if (!isLoading && data.length === 0 && !error) {
       mutate(undefined, {
@@ -40,6 +43,7 @@ const TimeSheet = () => {
       });
     }
   }, [data, isLoading, error, mutate, refetch]);
+  // Group time sheet thành dạng IGroupTimeSheet
   useEffect(() => {
     if (data && data.length > 0) {
       const result = data.reduce((acc: IGroupTimeSheet[], curr: ITimeSheet) => {
@@ -72,7 +76,7 @@ const TimeSheet = () => {
       setGroupData([]);
     }
   }, [data]);
-
+  // Hàm xử lý mở modal chấm công và truyền vào time sheet vừa chọn
   const handleOpenTimeSheetModal = (ts: IGroupTimeSheet, index: number) => {
     setOpenModal(true);
     setSelectTimeSheet({ ...ts, index: index });
@@ -197,10 +201,10 @@ const TimeSheet = () => {
           </tbody>
         </table>
       </div>
-      {openModal && (
+      {openModal && selectTimeSheet && (
         <TimeSheetModal
           open={openModal}
-          onOpenchange={setOpenModal}
+          onOpenChange={setOpenModal}
           ts={selectTimeSheet}
         />
       )}

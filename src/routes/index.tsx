@@ -3,7 +3,7 @@ import Layout from "../layout";
 import { lazy, Suspense } from "react";
 import PublicRoute from "./publicRoute";
 import Loading from "@/components/ui/loading";
-import ReversedTable from "@/pages/table/ReversedTable";
+import ReservedTable from "@/pages/table/ReservedTable";
 const Home = lazy(() => import("../pages/home/Home"));
 const Order = lazy(() => import("../pages/order/Order"));
 const OrderList = lazy(() => import("../pages/order/OrderList"));
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
           {
             element: (
               <Suspense fallback={<Loading />}>
-                <ReversedTable />
+                <ReservedTable />
               </Suspense>
             ),
             path: "/serving/orders/tables/reverse-table",

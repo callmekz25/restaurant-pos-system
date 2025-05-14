@@ -193,22 +193,37 @@ const Order = () => {
     let foods: [{ foodId: string }?] = [];
 
     Object.keys(checkedItems).forEach((foodId) => {
-      console.log(checkedItems[foodId]);
-
       if (checkedItems[foodId]) {
         const currentFood = order.foods.find((food) => food.foodId == foodId);
         foods.push(currentFood);
+
+        setOrder(() => ({
+          ...order,
+          foods: order.foods.filter((food) => food.foodId != foodId),
+        }));
       }
+
+      // queryClient.invalidateQueries({
+      //   queryKey: ["order", tableId],
+      // });
     });
 
-    moveFoods({
-      tableId: tableId,
-      requestData: {
-        foods: foods,
-        changedSeatId: changeTableId,
-        serverId: "EMP001",
+    moveFoods(
+      {
+        tableId: tableId,
+        requestData: {
+          foods: foods,
+          changedSeatId: changeTableId,
+          serverId: "EMP001",
+        },
       },
-    });
+      {
+        onSuccess: () => {
+          toast.success("Move foods successfully !!!");
+        },
+        onError: () => toast.error("Move foods fail !!!"),
+      }
+    );
   };
 
   // Ham xu ly dat mon

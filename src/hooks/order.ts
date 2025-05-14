@@ -19,7 +19,7 @@ export const useGetOrders = () => {
 
 export const useGetOrderByTableId = (tableId: string) => {
   return useQuery({
-    queryKey: ['orders', tableId],
+    queryKey: ['order', tableId],
     queryFn: () => getOrderByTableId(tableId),    
     enabled: !!tableId
   });

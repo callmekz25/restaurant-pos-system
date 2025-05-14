@@ -30,6 +30,20 @@ export const createOrder = async (createOrderRequest: CreateOrderRequest) => {
   }
 };
 
+export const addFoodIntoOrder = async (addFoodObject: any) => {
+  try {
+    const { data } = await httpRequest.post(
+      `/orders/add-food/${addFoodObject.tableId}`,
+      addFoodObject.food
+    );
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const payOrder = async (paymentObject: any) => {
   try {
     const { data } = await httpRequest.put(
@@ -43,11 +57,11 @@ export const payOrder = async (paymentObject: any) => {
   }
 };
 
-export const addFoodIntoOrder = async (addFoodObject: any) => {
+export const moveFoods = async (MoveFoodsObject: any) => {
   try {
-    const { data } = await httpRequest.post(
-      `/orders/add-food/${addFoodObject.tableId}`,
-      addFoodObject.food
+    const { data } = await httpRequest.put(
+      `/orders/move-foods/${MoveFoodsObject.tableId}`,
+      MoveFoodsObject.requestData
     );
 
     return data;

@@ -29,6 +29,7 @@ import {
   useAddFood,
   useCreateOrder,
   useGetOrderByTableId,
+  useMoveFoods,
   usePayOrder,
 } from "@/hooks/order";
 import OnTableOrder from "@/interfaces/order/onTableOrder.interface";
@@ -42,6 +43,7 @@ import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface"
 import formatPriceToVND from "@/utils/formatPriceToVND";
 import { ToastContainer, toast } from "react-toastify";
 import TableStatus from "@/enum/tableStatus";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Order = () => {
   // useParam
@@ -52,12 +54,7 @@ const Order = () => {
   const { mutate: payOrder, isPending: isPayPending } = usePayOrder();
   const { mutate: addFoodIntoOrder, isPending: isAddFoodPending } =
     useAddFood();
-
-  const {
-    data: orderData,
-    isLoading: isODLoading,
-    error: orderDetailError,
-  } = useGetOrderByTableId(tableId!);
+  const { mutate: moveFoods, isPending: isMoveFoodsPending } = useMoveFoods();
 
   // useQuery
   const {
@@ -79,6 +76,12 @@ const Order = () => {
     refetch: refechTables,
   } = useGetTables(TableStatus.AVAILABLE);
 
+  const {
+    data: orderData,
+    isLoading: isODLoading,
+    error: orderDetailError,
+  } = useGetOrderByTableId(tableId!);
+
   // Params
   const emptyOrder = {
     orderId: "",
@@ -93,11 +96,15 @@ const Order = () => {
     total: 0,
   } as OnTableOrder;
 
+  const queryClient = useQueryClient();
+
   // States
   const [noteWriting, setNoteWriting] = useState<boolean>(false);
   const [note, setNote] = useState<string>("");
   const [order, setOrder] = useState<OnTableOrder>(emptyOrder);
-  const [checkedItems, setCheckedItems] = useState({});
+  const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   // useEffect
 
@@ -115,6 +122,18 @@ const Order = () => {
       }
     }
   }, [orderData]);
+
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["tables", "ALL"],
+    });
+
+    queryClient.invalidateQueries({
+      queryKey: ["tables", "AVAILABLE"],
+    });
+
+    console.log(order);
+  }, [order]);
 
   // Init code
   if (isFoodLoading || isFoodTypeLoading || isTablesLoading) {
@@ -168,6 +187,28 @@ const Order = () => {
         onSuccess: () => toast.success("Add food successfully !!"),
       });
     }
+  };
+
+  const processMoveFoods = (changeTableId: string) => {
+    let foods: [{ foodId: string }?] = [];
+
+    Object.keys(checkedItems).forEach((foodId) => {
+      console.log(checkedItems[foodId]);
+
+      if (checkedItems[foodId]) {
+        const currentFood = order.foods.find((food) => food.foodId == foodId);
+        foods.push(currentFood);
+      }
+    });
+
+    moveFoods({
+      tableId: tableId,
+      requestData: {
+        foods: foods,
+        changedSeatId: changeTableId,
+        serverId: "EMP001",
+      },
+    });
   };
 
   // Ham xu ly dat mon
@@ -277,6 +318,7 @@ const Order = () => {
                   <Select
                     defaultValue=""
                     disabled={!Object.values(checkedItems).includes(true)}
+                    onValueChange={(value) => processMoveFoods(value)}
                   >
                     <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black min-w-[100px]">
                       <SelectValue placeholder="Move to ..." />

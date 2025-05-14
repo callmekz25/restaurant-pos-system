@@ -1,6 +1,5 @@
 import httpRequest from "@/config/axios/axios.config";
 import IAttendanceRequest from "@/interfaces/timesheet/attendanceRequest";
-import ITimeSheet from "@/interfaces/timesheet/timeSheet.interface";
 
 export const getTimeSheetByMonth = async (month: string, year: string) => {
   try {
@@ -21,12 +20,17 @@ export const initTimeSheet = async () => {
   }
 };
 
-export const attendance = async (attendanceRequest: IAttendanceRequest) => {
+export const attendance = async (request: IAttendanceRequest) => {
   try {
-    const { data } = await httpRequest.post(
-      "/timesheets/attendance",
-      attendanceRequest
-    );
+    const { data } = await httpRequest.post("/timesheets/attendance", request);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const absent = async (request: IAttendanceRequest) => {
+  try {
+    const { data } = await httpRequest.post("/timesheets/absent", request);
     return data;
   } catch (error) {
     console.log(error);

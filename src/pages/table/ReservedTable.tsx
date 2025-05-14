@@ -1,3 +1,4 @@
+import Loading from "@/components/ui/loading";
 import {
   Select,
   SelectContent,
@@ -5,11 +6,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import formatPriceToVND from "@/utils/formatPriceToVND";
-import { Divide } from "lucide-react";
+import { useGetReservedTables } from "@/hooks/reservedTable";
+import IReservedTable from "@/interfaces/table/reservedTable.interface";
+import formatDate from "@/utils/formatDate";
+import formatTime from "@/utils/formatTime";
 
 const ReservedTable = () => {
-  const testArr = [1, 2, 3];
+  const {
+    data: reservedTables,
+    isLoading: isRTLoading,
+    isError: isRTError,
+  } = useGetReservedTables();
+
+  if (isRTLoading) {
+    return <Loading></Loading>;
+  }
+
+  console.log(reservedTables);
+
   return (
     <>
       <div className="px-2 mt-5  ">
@@ -86,25 +100,37 @@ const ReservedTable = () => {
               <div className="flex-1"></div>
             </div>
             <hr className="mb-5"></hr>
-            <div className="flex justify-between">
-              <div className="flex-1">
-                <span className="py-2 px-4 outline-1 outline-red-400 text-red-400">
-                  08:00 AM
-                </span>
+            {reservedTables.map((reservedTable: IReservedTable) => (
+              <div className="flex justify-between">
+                <div className="flex-1">
+                  <span className="py-2 px-4 outline-1 outline-red-400 text-red-400">
+                    {formatTime(new Date(reservedTable.bookedTime))}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  {new Date(reservedTable.bookedTime) == new Date() ? (
+                    <span className="py-2 px-4 bg-red-400 rounded-4xl">
+                      Today
+                    </span>
+                  ) : (
+                    <span className="py-2 px-4 bg-gray-400 rounded-4xl">
+                      {formatDate(new Date(reservedTable.bookedTime))}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1">{reservedTable.customerFullName}</div>
+                <div className="flex-1">{reservedTable.customerPhone}</div>
+                <div className="flex-1">{reservedTable.slots}</div>
+                <div className="flex-1">
+                  {reservedTable.seatId ?? "No picked table"}
+                </div>
+                <div className="flex-1">
+                  <button className="cursor-pointer bg-blue-500 px-3 py-1 rounded-2xl hover:opacity-80">
+                    View detail
+                  </button>
+                </div>
               </div>
-              <div className="flex-1">
-                <span className="py-2 px-4 bg-red-400 rounded-4xl">Today</span>
-              </div>
-              <div className="flex-1">Khoa</div>
-              <div className="flex-1">0123456789</div>
-              <div className="flex-1">4</div>
-              <div className="flex-1">T01</div>
-              <div className="flex-1">
-                <button className="cursor-pointer bg-blue-500 px-3 py-1 rounded-2xl hover:opacity-80">
-                  View detail
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

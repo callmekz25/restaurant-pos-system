@@ -1,6 +1,7 @@
 import IAttendanceRequest from "@/interfaces/timesheet/attendanceRequest";
 import ITimeSheet from "@/interfaces/timesheet/timeSheet.interface";
 import {
+  absent,
   attendance,
   getTimeSheetByMonth,
   initTimeSheet,
@@ -23,6 +24,12 @@ export const useInitTimeSheet = () => {
 
 export const useAttendance = () => {
   return useMutation({
-    mutationFn: (data: IAttendanceRequest) => attendance(data),
+    mutationFn: (request: IAttendanceRequest) => attendance(request),
+  });
+};
+
+export const useAbsent = () => {
+  return useMutation({
+    mutationFn: (request: IAttendanceRequest) => absent(request),
   });
 };

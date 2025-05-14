@@ -53,11 +53,17 @@ const OrderCard = ({
         </span>
       </div>
       <div className="flex items-center gap-3 mt-4">
-        <Link className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2">
+        <Link
+          to={""}
+          className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2"
+        >
           <EyeIcon className="size-4" />
           <span>View Detail</span>
         </Link>
-        <Link className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2">
+        <Link
+          to={""}
+          className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2"
+        >
           <EditIcon className="size-4" />
           <span>Edit Order</span>
         </Link>

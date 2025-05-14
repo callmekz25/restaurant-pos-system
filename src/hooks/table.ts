@@ -8,13 +8,14 @@ export const useGetTables = (
   statusList: { status: TableStatus; color: string; isChecked: boolean }[]
 ) => {
   return useQuery({
-    queryKey: ["tables", statusList],
+    queryKey: ["tables", status.length],
     queryFn: () => getTables(statusList.map((status) => status.status)),
   });
 };
 
 export const useCreateReservedTable = () => {
   return useMutation({
-    mutationFn: (requestData: IReservedTable) => createReservedTable(requestData)
+    mutationFn: (requestData: IReservedTable) =>
+      createReservedTable(requestData),
   });
 };

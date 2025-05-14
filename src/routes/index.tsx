@@ -38,7 +38,7 @@ const router = createBrowserRouter([
                 <ReservedTable />
               </Suspense>
             ),
-            path: "/serving/orders/tables/reverse-table",
+            path: "/serving/orders/tables/resevse-table",
           },
           {
             element: (

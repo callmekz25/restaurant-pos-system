@@ -272,6 +272,9 @@ const Order = () => {
           setOrder(emptyOrder);
           setCheckedItems({});
           toast.success("Payment successfull");
+          queryClient.invalidateQueries({
+            queryKey: ["tables", 4],
+          });
         },
         onError: () => toast.error("Payment fail"),
       }

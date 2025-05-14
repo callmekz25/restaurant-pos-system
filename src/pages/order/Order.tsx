@@ -165,6 +165,7 @@ const Order = () => {
       }
     });
 
+    // Neu san pham do chua ton tai
     if (isNew) {
       setOrder(() => ({
         ...order,
@@ -179,13 +180,17 @@ const Order = () => {
 
     // Neu don order da ton tai
     if (order.orderId != "") {
-      const addFoodObject = {
-        tableId: tableId,
-        food: od,
-      };
-      addFoodIntoOrder(addFoodObject, {
-        onSuccess: () => toast.success("Add food successfully !!"),
-      });
+      addFoodIntoOrder(
+        {
+          tableId: tableId,
+          food: od,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Add food successfully !!");
+          },
+        }
+      );
     }
   };
 
@@ -266,6 +271,7 @@ const Order = () => {
         onSuccess: () => {
           setOrder(emptyOrder);
           setCheckedItems({});
+          setNote("");
           toast.success("Payment successfull");
         },
         onError: () => toast.error("Payment fail"),

@@ -13,6 +13,7 @@ import formatPriceToVND from "@/utils/formatPriceToVND";
 const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
   const [amount, setAmount] = useState<number>(1);
   const [note, setNote] = useState<string>("");
+  const [isDialogOpend, setisDialogOpend] = useState<boolean>(false);
 
   return (
     <div className=" rounded-md overflow-hidden border border-gray-200 shadow flex flex-col flex-1">
@@ -27,7 +28,7 @@ const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
           <span className=" font-medium text-sm">
             {formatPriceToVND(food.price)}
           </span>
-          <Dialog>
+          <Dialog open={isDialogOpend} onOpenChange={setisDialogOpend}>
             <DialogTrigger asChild>
               <button className="flex text-[13px] font-medium items-center gap-2 rounded border border-gray-300 py-1.5 px-2 cursor-pointer hover:opacity-60">
                 <ShoppingCartIcon className="size-4" />
@@ -120,12 +121,15 @@ const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
                   </div>
                 </div>
                 <div className="flex items-center text-[13px] justify-end font-medium  gap-5 mt-5">
-                  <button className="border border-gray-300 px-4 py-1.5 rounded cursor-pointer hover:opacity-60">
+                  <button
+                    className="border border-gray-300 px-4 py-1.5 rounded cursor-pointer hover:opacity-60"
+                    onClick={() => setisDialogOpend(false)}
+                  >
                     Huỷ
                   </button>
                   <button
                     className="bg-[#ebc01c] px-3 py-2 rounded cursor-pointer hover:opacity-60"
-                    onClick={() =>
+                    onClick={() => {
                       onAddToCart({
                         foodId: food.foodId,
                         foodImage: food.foodImage,
@@ -135,8 +139,10 @@ const ProductCard = ({ food, onAddToCart }: ProductCardProps) => {
                         actualPrice: amount * food.price,
                         variantId: "",
                         variantName: "",
-                      } as OnTableOrderDetail)
-                    }
+                      } as OnTableOrderDetail);
+
+                      setisDialogOpend(false);
+                    }}
                   >
                     Thêm vào đơn
                   </button>

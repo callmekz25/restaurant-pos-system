@@ -1,7 +1,8 @@
 import httpRequest from "@/config/axios/axios.config";
 import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface";
-import OnTableOrder from "@/interfaces/order/onTableOrder.interface";
 
+
+// GET
 export const getOrders = async () => {
   try {
     const { data } = await httpRequest.get("/orders/get-orders");
@@ -20,6 +21,15 @@ export const getOrderByTableId = async (tableId: string) => {
   }
 };
 
+export const getOrderByOrderId = async (orderId: string) => {
+  try {
+    const { data } = await httpRequest.get(`/orders/${orderId}`);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+// POST
 export const createOrder = async (createOrderRequest: CreateOrderRequest) => {
   try {
     const { data } = await httpRequest.post("/orders", createOrderRequest);
@@ -30,6 +40,7 @@ export const createOrder = async (createOrderRequest: CreateOrderRequest) => {
   }
 };
 
+// PUT/PATCH
 export const addFoodIntoOrder = async (addFoodObject: any) => {
   try {
     const { data } = await httpRequest.post(

@@ -2,6 +2,7 @@ import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface"
 import {
   addFoodIntoOrder,
   createOrder,
+  getOrderByOrderId,
   getOrderByTableId,
   getOrders,
   moveFoods,
@@ -22,6 +23,13 @@ export const useGetOrderByTableId = (tableId: string) => {
   return useQuery({
     queryKey: ["order", tableId],
     queryFn: () => getOrderByTableId(tableId),
+  });
+};
+
+export const useGetOrderByOrderId = (orderId: string) => {
+  return useQuery({
+    queryKey: ["order", orderId],
+    queryFn: () => getOrderByOrderId(orderId),
   });
 };
 

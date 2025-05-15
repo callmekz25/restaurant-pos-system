@@ -44,6 +44,7 @@ import formatPriceToVND from "@/utils/formatPriceToVND";
 import { ToastContainer, toast } from "react-toastify";
 import TableStatus from "@/enum/tableStatus";
 import { useQueryClient } from "@tanstack/react-query";
+import OrderStatus from "@/enum/orderStatus";
 
 const Order = () => {
   // useParam
@@ -73,10 +74,7 @@ const Order = () => {
     data: tables,
     isLoading: isTablesLoading,
     error: tableError,
-    refetch: refechTables,
-  } = useGetTables([
-    { status: TableStatus.AVAILABLE, color: "", isChecked: true },
-  ]);
+  } = useGetTables([TableStatus.AVAILABLE]);
 
   const {
     data: orderData,
@@ -140,7 +138,7 @@ const Order = () => {
     return <Loading />;
   }
 
-  // Handle Functions
+  // Handler Functions
 
   // Ham them/chon food vao order
   const processAddFood = (od: OnTableOrderDetail) => {
@@ -194,6 +192,7 @@ const Order = () => {
     }
   };
 
+  // Ham di chuyen foods sang 1 ban khac
   const processMoveFoods = (changeTableId: string) => {
     let foods: [{ foodId: string }?] = [];
 
@@ -207,10 +206,6 @@ const Order = () => {
           foods: order.foods.filter((food) => food.foodId != foodId),
         }));
       }
-
-      // queryClient.invalidateQueries({
-      //   queryKey: ["order", tableId],
-      // });
     });
 
     moveFoods(
@@ -249,6 +244,16 @@ const Order = () => {
       onSuccess: (data) => {
         setOrder(data);
         toast.success("Order has been created!");
+
+        // fetch lai so ban dang ko co khach
+        queryClient.invalidateQueries({
+          queryKey: ["tables", [TableStatus.AVAILABLE]],
+        });
+
+        // fetch lai toan bo ban
+        queryClient.invalidateQueries({
+          queryKey: ["tables", ...STATUS_TABLE.map((table) => table.status)],
+        });
       },
       onError: (error) => {
         console.log(error);
@@ -273,7 +278,11 @@ const Order = () => {
           setCheckedItems({});
           toast.success("Payment successfull");
           queryClient.invalidateQueries({
-            queryKey: ["tables", 4],
+            queryKey: ["tables", STATUS_TABLE.map((table) => table.status)],
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ["order", tableId],
           });
         },
         onError: () => toast.error("Payment fail"),

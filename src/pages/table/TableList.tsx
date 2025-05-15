@@ -19,7 +19,9 @@ const TableList = () => {
     data: tablesData,
     isLoading,
     error,
-  } = useGetTables(tables.filter((table) => table.isChecked));
+  } = useGetTables(
+    tables.filter((table) => table.isChecked).map((table) => table.status)
+  );
 
   // useEffect
 

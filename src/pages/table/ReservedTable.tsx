@@ -7,14 +7,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetReservedTables } from "@/hooks/reservedTable";
-import { useCreateReservedTable } from "@/hooks/table";
+import { useCreateReservedTable, useGetReservableTables } from "@/hooks/table";
 import IReservedTable from "@/interfaces/table/reservedTable.interface";
-import toDatetimeLocalString from "@/utils/DateToISOString";
+import toDatetimeLocalString from "@/utils/toDatetimeLocalString";
 import formatDate from "@/utils/formatDate";
 import formatTime from "@/utils/formatTime";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import ITable from "@/interfaces/table/table.interface";
 
 const ReservedTable = () => {
   // Params
@@ -24,9 +25,9 @@ const ReservedTable = () => {
     orderId: "",
     customerPhone: "",
     seatId: "",
-    bookedTime: undefined,
+    bookedTime: toDatetimeLocalString(new Date()),
     createdAt: undefined,
-    slots: undefined,
+    slots: 0,
   };
 
   const queryClient = useQueryClient();
@@ -42,8 +43,24 @@ const ReservedTable = () => {
     isError: isRTError,
   } = useGetReservedTables();
 
+  const {
+    data: reservableTables,
+    isLoading: isRableTLoading,
+    isError: isRableTError,
+  } = useGetReservableTables({
+    resersedDate: reservedTable.bookedTime,
+    slots: reservedTable.slots,
+  });
+
   // useMutation
   const { mutate: createReservedTable } = useCreateReservedTable();
+
+  // useEffect
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["reservable-tables"],
+    });
+  }, [reservedTable]);
 
   if (isRTLoading) {
     return <Loading></Loading>;
@@ -56,6 +73,7 @@ const ReservedTable = () => {
         queryClient.invalidateQueries({
           queryKey: ["reserved-tables"],
         });
+        setReservedTable(initReservedTable);
       },
       onError: (error) => {
         console.log(error);
@@ -113,25 +131,31 @@ const ReservedTable = () => {
                 type="datetime-local"
                 className="p-2 border-b-2"
                 placeholder="Reserved Time"
-                value={
-                  reservedTable.bookedTime != undefined
-                    ? toDatetimeLocalString(new Date(reservedTable.bookedTime!))
-                    : undefined
-                }
+                value={toDatetimeLocalString(
+                  new Date(reservedTable.bookedTime!)
+                )}
                 onChange={(e) => {
-                  console.log(e.target.value);
                   setReservedTable({
                     ...reservedTable,
-                    bookedTime: new Date(e.target.value),
+                    bookedTime: e.target.value,
                   });
                 }}
               ></input>
-              <Select defaultValue="">
+              <Select
+                defaultValue=""
+                onValueChange={(value) =>
+                  setReservedTable({ ...reservedTable, seatId: value })
+                }
+              >
                 <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black min-w-[100px]">
-                  <SelectValue placeholder="Choose table" />
+                  <SelectValue placeholder="Choose table ..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={"1"}>{"1"}</SelectItem>
+                  {reservableTables != undefined
+                    ? reservableTables.map((rT: ITable) => (
+                        <SelectItem value={rT.seatId}>{rT.seatId}</SelectItem>
+                      ))
+                    : ""}
                   <hr></hr>
                   <SelectItem value={"test"}>See more details ...</SelectItem>
                 </SelectContent>
@@ -192,7 +216,9 @@ const ReservedTable = () => {
                 <div className="flex-1">{rt.customerFullName}</div>
                 <div className="flex-1">{rt.customerPhone}</div>
                 <div className="flex-1">{rt.slots}</div>
-                <div className="flex-1">{rt.seatId ?? "No picked table"}</div>
+                <div className="flex-1">
+                  {rt.seatId.length != 0 ? rt.seatId : "No picked table"}
+                </div>
                 <div className="flex-1">
                   <button className="cursor-pointer bg-blue-500 px-3 py-1 rounded-2xl hover:opacity-80">
                     View detail

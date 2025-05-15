@@ -4,9 +4,9 @@ interface IReservedTable {
   orderId: string;
   customerFullName: string;
   customerPhone: string;
-  slots?: number;
-  bookedTime?: Date;
+  slots: number;
+  bookedTime: string;
   createdAt?: Date;
 }
 
-export default IReservedTable
+export default IReservedTable;

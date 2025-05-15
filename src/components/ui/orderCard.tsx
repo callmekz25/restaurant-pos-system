@@ -6,13 +6,13 @@ import { BoxIcon, ClockIcon, EditIcon, EyeIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const OrderCard = ({
-  orderCode,
+  orderId,
   total_items,
   total,
   dateTime,
   statusOrder,
 }: {
-  orderCode: string;
+  orderId: string;
   total_items: number;
   total: number;
   dateTime: Date;
@@ -23,7 +23,7 @@ const OrderCard = ({
       <div className="flex items-center justify-between pb-2 ">
         <div className="flex flex-col">
           <h3 className="font-semibold text-sm">Guest</h3>
-          <span className="text-sm opacity-80">#{orderCode}</span>
+          <span className="text-sm opacity-80">#{orderId}</span>
         </div>
         <div className="flex   bg-[#daebfb] text-blue-600 items-center gap-2 rounded-full py-1 px-2">
           <ClockIcon className="size-4" />
@@ -54,15 +54,15 @@ const OrderCard = ({
       </div>
       <div className="flex items-center gap-3 mt-4">
         <Link
-          to={""}
-          className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2"
+          to={orderId}
+          className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2 hover:opacity-80"
         >
           <EyeIcon className="size-4" />
-          <span>View Detail</span>
+          <span>Detail</span>
         </Link>
         <Link
           to={""}
-          className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2"
+          className="flex border font-medium text-[13px] border-gray-300 rounded-md w-full px-4 py-2 items-center gap-2 hover:opacity-80"
         >
           <EditIcon className="size-4" />
           <span>Edit Order</span>

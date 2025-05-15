@@ -34,7 +34,7 @@ const OrderList = () => {
               <OrderCard
                 statusOrder={order.status}
                 key={order.orderId}
-                orderCode={order.orderId}
+                orderId={order.orderId}
                 total={order.total}
                 total_items={order.foods.length}
                 dateTime={order.timeIn}

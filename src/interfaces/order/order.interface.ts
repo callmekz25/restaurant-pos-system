@@ -5,6 +5,7 @@ interface Order {
   orderId: string;
   seatId: string;
   cashierId: string;
+  serverId: string;
   timeIn: Date;
   timeOut: Date;
   status: OrderStatus;

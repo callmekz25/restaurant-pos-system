@@ -13,7 +13,7 @@ import {
   DialogDescription,
 } from "../ui/dialog";
 import formatDate from "@/utils/formatDate";
-import { PlusIcon, TrashIcon } from "lucide-react";
+import { EditIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { useAbsent, useAttendance } from "@/hooks/timeSheet";
 import { useQueryClient } from "@tanstack/react-query";
 import IGroupTimeSheet from "@/interfaces/timesheet/groupTimeSheet.interface";
@@ -22,6 +22,12 @@ import AddViolationModal from "./addViolation.modal";
 import { useGetViolations } from "@/hooks/violation";
 import IViolationRequest from "@/interfaces/violation/violationRequest";
 import { useForm, Controller } from "react-hook-form";
+import {
+  useAddViolationRecord,
+  useGetVRByEmpIdAndWorkingDate,
+} from "@/hooks/violationRecord";
+import IViolationRecordRequest from "@/interfaces/violationRecord/violationRecordRequest";
+import IViolationRecord from "@/interfaces/violationRecord/violationRecord";
 interface Ts extends IGroupTimeSheet {
   index: number;
 }
@@ -49,34 +55,57 @@ const TimeSheetModal = ({
       menuTimeSheet: "attendance",
       workingHours: 8,
       workShiftId: "",
-      violationId: "",
     },
   });
+  const [employeeViolations, setEmployeeViolations] = useState<
+    IViolationRecord[] | []
+  >([
+    {
+      violationRecordId: "",
+      empId: "",
+      workingDate: "",
+      violation: {
+        violationId: "",
+        violationContent: "",
+        violationFine: 0,
+      },
+      violationTime: "",
+    },
+  ]);
+  const timesheet = ts?.timesheets[ts.index];
   const statusAttendance = watch("statusAttendance");
-  const violationId = watch("violationId");
+
   const menuTimeSheet = watch("menuTimeSheet");
   const workingHours = watch("workingHours");
-  const [selectViolation, setSelectViolation] =
-    useState<IViolationRequest | null>(null);
+
   const [openViolationModal, setOpenViolationModal] = useState<boolean>(false);
+  // Lấy ra các VR của nhân viên
+  const {
+    data: violationRecords,
+    isLoading: isVRLoading,
+    error: errorVR,
+    refetch,
+  } = useGetVRByEmpIdAndWorkingDate(ts.empId, timesheet.workingDate);
   const { mutate: markWork, isPending: isMarkWorkPending } = useAttendance();
   const { mutate: markAbsent, isPending: isMarkAbsentPending } = useAbsent();
+  const { mutate: addViolationRecord, isPending: isAddViolationRecordPending } =
+    useAddViolationRecord();
   const {
     data: violations,
     isLoading: isViolationsLoading,
-    error,
+    error: errorViolations,
   } = useGetViolations();
-  const timesheet = ts?.timesheets[ts.index];
-  console.log(timesheet);
   useEffect(() => {
-    if (violationId !== "" && violations) {
-      setSelectViolation(
-        violations.find((v: IViolationRequest) => v.violationId === violationId)
-      );
+    if (open) {
+      refetch();
     }
-  }, [violationId, violations]);
-  console.log(selectViolation);
+  }, [open]);
 
+  useEffect(() => {
+    if (violationRecords && violationRecords.length > 0) {
+      setEmployeeViolations(violationRecords);
+    }
+  }, [violationRecords]);
   // Hàm chấm công đi làm hay vắng làm dựa vào status attendance
   const handleAttendance = () => {
     const request = {
@@ -104,17 +133,61 @@ const TimeSheetModal = ({
       });
     }
   };
+  // Hàm lấy ra thông tin của violations vừa select để render ra số tiền của violation đó
+  const handleSelectViolation = (index: number, violationId: string) => {
+    const selectViolation: IViolationRequest = violations.find(
+      (v: IViolationRequest) => v.violationId === violationId
+    );
+    const updateEmployeeViolations = [...employeeViolations];
+    updateEmployeeViolations[index] = {
+      ...updateEmployeeViolations[index],
+      violation: {
+        violationId: selectViolation.violationId,
+        violationContent: selectViolation.violationContent,
+        violationFine: selectViolation.violationFine,
+      },
+    };
+    setEmployeeViolations(updateEmployeeViolations);
+  };
+  // Hàm ghi nhận phạt các vi phạm
+  const handleAddViolationRecords = () => {
+    const violationRecordRequest: IViolationRecordRequest[] =
+      employeeViolations.map((ev) => {
+        return {
+          violationId: ev.violation.violationId!,
+          empId: ts.empId,
+          workingDate: timesheet.workingDate,
+        };
+      });
+    addViolationRecord(violationRecordRequest, {
+      onSuccess: () => {
+        console.log("Add violation record success!");
+      },
+    });
+  };
+  const actionHandlers: Record<string, () => void> = {
+    attendance: handleAttendance,
+    violation: handleAddViolationRecords,
+  };
+  // Hàm dựa vào menu timesheet để gọi tới hàm chấm công hay phạt vi phạm
+  const handleSave = () => {
+    const handler = actionHandlers[menuTimeSheet];
+    if (handler) {
+      handler();
+    } else {
+      alert("Error try again!");
+    }
+  };
+  console.log(violationRecords);
 
-  console.log(statusAttendance);
-
-  if (isMarkWorkPending || isMarkAbsentPending) {
+  if (isMarkWorkPending || isMarkAbsentPending || isAddViolationRecordPending) {
     return <TransparentLoading />;
   }
   return (
     <form>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTitle className="hidden"></DialogTitle>
-        <DialogContent className=" outline-none rounded px-5 py-5 flex flex-col min-w-[700px] ">
+        <DialogContent className=" outline-none rounded px-5 py-5 flex flex-col min-w-[800px] ">
           <DialogDescription className="hidden"></DialogDescription>
           <h3 className="text-xl font-semibold text-center">Time Sheet</h3>
           <div className="flex justify-between items-start ">
@@ -218,7 +291,6 @@ const TimeSheetModal = ({
                       <input
                         id="hours"
                         type="number"
-                        value={workingHours}
                         {...register("workingHours")}
                         className="outline-none border border-gray-300 rounded px-2 py-1.5 w-20"
                       />
@@ -232,68 +304,99 @@ const TimeSheetModal = ({
                   <div className="mt-5 text-sm">
                     <div className="flex items-center font-medium ">
                       <p className="w-[45%] px-4">Violation Content</p>
-                      <p className="w-[25%] px-4">Penalties apply</p>
+                      <p className="w-[25%] px-4">Amount</p>
                       <p className="w-[25%] px-4">Into Money</p>
                       <p className="flex-1 px-4"></p>
                     </div>
-                    <div className="flex items-center text-[13px] mt-4">
-                      <div className="px-4 w-[45%]">
-                        <Controller
-                          name="violationId"
-                          control={control}
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
+                    <div className="flex flex-col gap-6 mt-4 max-h-[160px] overflow-y-auto pr-2">
+                      {employeeViolations.map(
+                        (ev: IViolationRecord, index: number) => {
+                          return (
+                            <div
+                              key={index}
+                              className="flex items-center text-[13px] "
                             >
-                              <SelectTrigger className=" border border-gray-300  text-[13px] rounded outline-none shadow-none  text-black ">
-                                <SelectValue placeholder="Choose violation" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {violations &&
-                                  violations.length > 0 &&
-                                  violations.map((v: IViolationRequest) => {
-                                    return (
-                                      <SelectItem
-                                        key={v.violationId}
-                                        value={v.violationId ?? ""}
-                                      >
-                                        {v.violationContent}
-                                      </SelectItem>
-                                    );
-                                  })}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        />
-                      </div>
-                      <div className="px-4 w-[25%]">
-                        <input
-                          type="text"
-                          name=""
-                          id=""
-                          className=" outline-none w-full  px-1  border-b border-gray-400"
-                          value={selectViolation?.violationFine}
-                        />
-                      </div>
-                      <div className="px-4 w-[25%]">
-                        <input
-                          type="text"
-                          readOnly
-                          name=""
-                          id=""
-                          className=" outline-none w-full  px-1 border-b border-gray-400"
-                          value={selectViolation?.violationFine}
-                        />
-                      </div>
-                      <div className="flex-1 flex items-center justify-center">
-                        <button>
-                          <TrashIcon className="size-4 text-red-500" />
-                        </button>
-                      </div>
+                              <div className="px-4  flex-[0_0_45%] max-w-[45%] flex items-center gap-2">
+                                <Select
+                                  value={ev.violation.violationId}
+                                  onValueChange={(val) =>
+                                    handleSelectViolation(index, val)
+                                  }
+                                >
+                                  <SelectTrigger className=" border border-gray-300   text-[13px] rounded outline-none shadow-none  text-black ">
+                                    <SelectValue placeholder="Choose violation" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {violations &&
+                                      violations.length > 0 &&
+                                      violations.map((v: IViolationRequest) => {
+                                        return (
+                                          <SelectItem
+                                            key={v.violationId}
+                                            value={v.violationId ?? ""}
+                                          >
+                                            {v.violationContent}
+                                          </SelectItem>
+                                        );
+                                      })}
+                                  </SelectContent>
+                                </Select>
+                                <button
+                                  onClick={() => setOpenViolationModal(true)}
+                                >
+                                  <PlusIcon className="size-5 opacity-60 cursor-pointer" />
+                                </button>
+                                <button>
+                                  <EditIcon className="size-5 opacity-60 cursor-pointer" />
+                                </button>
+                              </div>
+                              <div className="px-4 flex-[0_0_25%] max-w-[25%]">
+                                <input
+                                  type="text"
+                                  readOnly
+                                  name=""
+                                  value="1"
+                                  id=""
+                                  className=" outline-none w-full  px-1  border-b border-gray-400"
+                                />
+                              </div>
+                              <div className="px-4 flex-[0_0_25%] max-w-[25%]">
+                                <input
+                                  type="text"
+                                  readOnly
+                                  value={ev.violation.violationFine}
+                                  name=""
+                                  id=""
+                                  className=" outline-none w-full  px-1 border-b border-gray-400"
+                                />
+                              </div>
+                              <div className="flex-1 flex items-center justify-center">
+                                <button>
+                                  <TrashIcon className="size-4 text-red-500" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        }
+                      )}
                     </div>
                     <button
-                      onClick={() => setOpenViolationModal(true)}
+                      onClick={() => {
+                        setEmployeeViolations((prev) => [
+                          {
+                            empId: ts.empId,
+                            workingDate: timesheet.workingDate,
+                            violationRecordId: "",
+                            violationTime: "",
+                            violation: {
+                              violationId: "",
+                              violationContent: "",
+                              violationFine: 0,
+                            },
+                          },
+                          ...prev,
+                        ]);
+                      }}
                       className="flex items-center gap-1 mt-10 text-[12px] border border-gray-400 rounded px-2 py-1.5"
                     >
                       <PlusIcon className="size-3" />
@@ -312,7 +415,7 @@ const TimeSheetModal = ({
               Cancel
             </button>
             <button
-              onClick={() => handleAttendance()}
+              onClick={() => handleSave()}
               className="px-4 py-2 bg-red-800 text-white rounded"
             >
               Save

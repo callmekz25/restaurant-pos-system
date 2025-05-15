@@ -88,9 +88,7 @@ const TimeSheet = () => {
 
   return (
     <div className=" px-5 py-10 bg-white min-h-[500px]">
-      <h2 className="text-center text-2xl font-bold mb-4 uppercase">
-        Time Sheet
-      </h2>
+      <h2 className="text-center text-2xl font-bold  uppercase">Time Sheet</h2>
       <div className="flex items-center mb-4 justify-between">
         <p className="text-center ">
           {month}, {year}
@@ -129,13 +127,13 @@ const TimeSheet = () => {
         <table className="table-fixed border  mb-4 border-black text-sm w-full text-center border-collapse">
           <thead>
             <tr>
-              <th className="border  border-gray-400 w-10 ">STT</th>
-              <th className="border  border-gray-400 w-40 p-5">Full Name</th>
-              <th className="border  border-gray-400 w-32">Position</th>
+              <th className="border  border-gray-300 w-10 ">STT</th>
+              <th className="border  border-gray-300 w-40 p-5">Full Name</th>
+              <th className="border  border-gray-300 w-32">Position</th>
               {days.map((d, i) => (
                 <th
                   key={d.day}
-                  className={`border  border-gray-400 w-10 ${
+                  className={`border  border-gray-300 w-15 ${
                     i + 1 ===
                     getDayFromDate(new Date().toISOString().slice(0, 10))
                       ? "bg-yellow-300"
@@ -147,11 +145,11 @@ const TimeSheet = () => {
               ))}
             </tr>
             <tr>
-              <td className="border  border-gray-400  " colSpan={3}></td>
+              <td className="border  border-gray-300  " colSpan={3}></td>
               {days.map((d, i) => (
                 <td
                   key={i}
-                  className={`border  border-gray-400 py-4 text-[13px] font-medium ${
+                  className={`border  border-gray-300 py-5 text-[13px] font-medium ${
                     i + 1 ===
                     getDayFromDate(new Date().toISOString().slice(0, 10))
                       ? "bg-yellow-300"
@@ -168,11 +166,11 @@ const TimeSheet = () => {
             {groupData.length > 0 &&
               groupData.map((ts: IGroupTimeSheet, index) => (
                 <tr key={index}>
-                  <td className="border border-gray-400 py-2">{index + 1}</td>
-                  <td className="border border-gray-400 text-left pl-1">
+                  <td className="border border-gray-300 py-4 ">{index + 1}</td>
+                  <td className="border border-gray-300 text-left pl-1">
                     {ts.empName}
                   </td>
-                  <td className="border border-gray-400">{ts.empTypeName}</td>
+                  <td className="border border-gray-300">{ts.empTypeName}</td>
 
                   {days.map((_, i) => {
                     const shift = markTimeSheet(ts, i + 1);
@@ -190,7 +188,7 @@ const TimeSheet = () => {
                       <td
                         key={i}
                         onClick={() => handleOpenTimeSheetModal(ts, i)}
-                        className={`border border-gray-400 cursor-pointer ${bgColor}`}
+                        className={`border border-gray-300 cursor-pointer ${bgColor}`}
                       >
                         {shift}
                       </td>

@@ -4,6 +4,7 @@ import { lazy, Suspense } from "react";
 import PublicRoute from "./publicRoute";
 import Loading from "@/components/ui/loading";
 import ReservedTable from "@/pages/table/ReservedTable";
+import OrderDetail from "@/pages/order/OrderDetail";
 const Home = lazy(() => import("../pages/home/Home"));
 const Order = lazy(() => import("../pages/order/Order"));
 const OrderList = lazy(() => import("../pages/order/OrderList"));
@@ -31,6 +32,14 @@ const router = createBrowserRouter([
               </Suspense>
             ),
             path: "/serving/orders",
+          },
+          {
+            element: (
+              <Suspense fallback={<Loading />}>
+                <OrderDetail />
+              </Suspense>
+            ),
+            path: "/serving/orders/:orderId",
           },
           {
             element: (

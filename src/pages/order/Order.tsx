@@ -80,6 +80,7 @@ const Order = () => {
     data: orderData,
     isLoading: isODLoading,
     error: orderDetailError,
+    refetch: refetchOrder,
   } = useGetOrderByTableId(tableId!);
 
   // Params
@@ -108,7 +109,7 @@ const Order = () => {
   // useEffect
 
   useEffect(() => {
-    if (orderData != undefined) {
+    if (orderData != undefined && Object.keys(orderData).length != 0) {
       setOrder(orderData);
 
       if (Object.keys(checkedItems).length == 0) {
@@ -279,10 +280,6 @@ const Order = () => {
           toast.success("Payment successfull");
           queryClient.invalidateQueries({
             queryKey: ["tables", STATUS_TABLE.map((table) => table.status)],
-          });
-
-          queryClient.invalidateQueries({
-            queryKey: ["order", tableId],
           });
         },
         onError: () => toast.error("Payment fail"),

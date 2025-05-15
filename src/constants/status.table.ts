@@ -19,7 +19,7 @@ const STATUS_TABLE = [
   {
     status: TableStatus.UNAVAILABLE,
     color: "#717075",
-    isChecked: false,
+    isChecked: true,
   },
 ] as { status: TableStatus; color: string; isChecked: boolean }[];
 export default STATUS_TABLE;

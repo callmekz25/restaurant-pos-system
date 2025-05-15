@@ -6,7 +6,6 @@ import OrderStatis from "@/interfaces/order/orderStatis.interface";
 
 const OrderList = () => {
   const { data: orders, isLoading, error } = useGetOrders();
-  console.log(orders);
   if (isLoading) {
     return <Loading />;
   }

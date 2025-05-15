@@ -1,5 +1,4 @@
 import CreateOrderRequest from '@/interfaces/order/createOrderRequest.interface';
-import OnTableOrder from '@/interfaces/order/onTableOrder.interface';
 import {
   addFoodIntoOrder,
   createOrder,

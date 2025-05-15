@@ -16,6 +16,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { use, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import ITable from "@/interfaces/table/table.interface";
+import { Link } from "react-router-dom";
+import { Check, MoreHorizontal, X } from "lucide-react";
 
 const ReservedTable = () => {
   // Params
@@ -186,42 +188,63 @@ const ReservedTable = () => {
           <div className="flex flex-col mt-4 gap-5">
             {/* TITLE ROW  */}
             <div className="flex justify-between items-center border-b-2 py-2 px-4">
-              <div className="flex-1 font-bold">Time</div>
-              <div className="flex-1 font-bold">Date</div>
-              <div className="flex-1 font-bold">Name</div>
-              <div className="flex-1 font-bold">Phone Number</div>
+              <div className="flex-2 font-bold">Time</div>
+              <div className="flex-2 font-bold">Date</div>
+              <div className="flex-2 font-bold">Name</div>
+              <div className="flex-2 font-bold">Phone Number</div>
               <div className="flex-1 font-bold">Slots</div>
-              <div className="flex-1 font-bold">Table</div>
+              <div className="flex-2 font-bold">Table</div>
+              <div className="flex-2 font-bold">Is Visited</div>
               <div className="flex-1"></div>
             </div>
             {reservedTables.map((rt: IReservedTable) => (
               <div className="flex justify-between items-center px-2 py-4 hover:opacity-90 hover:bg-gray-200">
-                <div className="flex-1">
+                <div className="flex-2">
                   <span className="py-2 px-4 outline-1 outline-red-400 text-red-400">
                     {formatTime(new Date(rt.bookedTime!))}
                   </span>
                 </div>
-                <div className="flex-1">
+                <div className="flex-2">
                   {new Date(rt.bookedTime!).getDate() ==
                   new Date().getDate() ? (
                     <span className="py-2 px-4 bg-red-400 rounded-4xl">
                       Today
                     </span>
                   ) : (
-                    <span className="py-2 px-4 bg-gray-400 rounded-4xl">
+                    <span
+                      className={`py-2 px-4 rounded-4xl ${
+                        new Date(rt.bookedTime).getDate() ==
+                        new Date().getDate() + 1
+                          ? "bg-yellow-300"
+                          : "bg-gray-400"
+                      }`}
+                    >
                       {formatDate(new Date(rt.bookedTime!))}
                     </span>
                   )}
                 </div>
-                <div className="flex-1">{rt.customerFullName}</div>
-                <div className="flex-1">{rt.customerPhone}</div>
+                <div className="flex-2">{rt.customerFullName}</div>
+                <div className="flex-2">{rt.customerPhone}</div>
                 <div className="flex-1">{rt.slots}</div>
-                <div className="flex-1">
+                <div className="flex-2">
                   {rt.seatId.length != 0 ? rt.seatId : "No picked table"}
                 </div>
+                <div className="flex-2">
+                  {rt.orderId == undefined || rt.orderId.length == 0 ? (
+                    <div className="flex gap-2">
+                      <span>Not yet</span>
+                      <X className="" color="red"></X>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <span>Yes</span>
+                      <Check className="" color="green"></Check>
+                    </div>
+                  )}
+                </div>
                 <div className="flex-1">
-                  <button className="cursor-pointer bg-blue-500 px-3 py-1 rounded-2xl hover:opacity-80">
-                    View detail
+                  <button className="cursor-pointer px-3 py-1 rounded-2xl hover:opacity-80 hover:bg-gray-400">
+                    <MoreHorizontal></MoreHorizontal>
                   </button>
                 </div>
               </div>

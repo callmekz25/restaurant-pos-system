@@ -1,7 +1,6 @@
 import httpRequest from "@/config/axios/axios.config";
 import CreateOrderRequest from "@/interfaces/order/createOrderRequest.interface";
 
-
 // GET
 export const getOrders = async () => {
   try {
@@ -23,7 +22,9 @@ export const getOrderByTableId = async (tableId: string) => {
 
 export const getOrderByOrderId = async (orderId: string) => {
   try {
-    const { data } = await httpRequest.get(`/orders/${orderId}`);
+    const { data } = await httpRequest.get(
+      `/orders/get-by-order-id/${orderId}`
+    );
     return data;
   } catch (error) {
     console.log(error);

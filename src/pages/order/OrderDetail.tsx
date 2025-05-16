@@ -1,4 +1,5 @@
 import { useGetOrderByOrderId, useGetOrderByTableId } from "@/hooks/order";
+import Order from "@/interfaces/order/order.interface";
 import formatPriceToVND from "@/utils/formatPriceToVND";
 import { ArrowLeft, Clock, Clock1 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
@@ -8,8 +9,9 @@ const OrderDetail = () => {
   const { orderId } = useParams();
 
   // useQuery
-  const {} = useGetOrderByOrderId(orderId!);
+  const {data: orderData , isLoading: isOrderLoading} = useGetOrderByOrderId(orderId!);
 
+  const order = orderData as Order;
   return (
     <>
       <div className="px-2 mt-5">

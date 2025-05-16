@@ -1,7 +1,27 @@
-const getDaysByMonthYear = (month: number, year: number) => {
+const getDaysByMonthYear = (
+  month: number,
+  year: number,
+  isWeek: boolean = false
+) => {
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thurs", "Fri", "Satur"];
   const result = [];
+  if (isWeek) {
+    const today = new Date();
+    const currentDay = today.getDay();
+    const week = [];
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - currentDay);
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekStart);
+      d.setDate(weekStart.getDate() + i);
 
+      week.push({
+        day: d.getDate(),
+        weekday: weekdays[d.getDay()],
+      });
+    }
+    return week;
+  }
   // Tính số ngày trong tháng
   const daysInMonth = new Date(year, month, 0).getDate(); // tháng truyền vào dạng 1–12
 

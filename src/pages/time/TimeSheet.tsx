@@ -1,7 +1,7 @@
 import Loading from "@/components/ui/loading";
 import { useGetTimeSheetByMonth, useInitTimeSheet } from "@/hooks/timeSheet";
 import getDayFromDate from "@/utils/getDayFromDate";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -20,18 +20,22 @@ interface Ts extends IGroupTimeSheet {
   index: number;
 }
 const TimeSheet = () => {
-  const days = getDaysByMonthYear(6, 2025);
   const [month, setMonth] = useState("MAY");
   const [year, setYear] = useState("2025");
   const [groupData, setGroupData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [isWeek, setIsWeek] = useState<boolean>(false);
   const [selectTimeSheet, setSelectTimeSheet] = useState<Ts | null>(null);
   const { data, isLoading, error, refetch } = useGetTimeSheetByMonth(
     month,
     year
   );
+  const days = useMemo(() => {
+    return getDaysByMonthYear(6, 2025, isWeek);
+  }, [isWeek]);
 
   const { mutate, isPending } = useInitTimeSheet();
+
   // Kiểm tra có time sheet tháng năm hiện tại có trong db, chưa thì khởi tạo và refetch lại
   useEffect(() => {
     if (!isLoading && data.length === 0 && !error) {
@@ -95,6 +99,18 @@ const TimeSheet = () => {
         </p>
         <div className="flex items-center gap-4">
           <Select
+            value={isWeek.toString()}
+            onValueChange={(e) => setIsWeek(e === "true")}
+          >
+            <SelectTrigger className="border border-gray-300 rounded outline-none shadow-none font-medium text-black ">
+              <SelectValue placeholder="Chọn tháng" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="true">Week</SelectItem>
+              <SelectItem value="false">Month</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
             defaultValue="6"
             value={month}
             onValueChange={(e) => setMonth(e)}
@@ -130,11 +146,11 @@ const TimeSheet = () => {
               <th className="border  border-gray-300 w-10 ">STT</th>
               <th className="border  border-gray-300 w-40 p-5">Full Name</th>
               <th className="border  border-gray-300 w-32">Position</th>
-              {days.map((d, i) => (
+              {days.map((d) => (
                 <th
                   key={d.day}
                   className={`border  border-gray-300 w-15 ${
-                    i + 1 ===
+                    d.day ===
                     getDayFromDate(new Date().toISOString().slice(0, 10))
                       ? "bg-yellow-300"
                       : ""
@@ -150,7 +166,7 @@ const TimeSheet = () => {
                 <td
                   key={i}
                   className={`border  border-gray-300 py-5 text-[13px] font-medium ${
-                    i + 1 ===
+                    d.day ===
                     getDayFromDate(new Date().toISOString().slice(0, 10))
                       ? "bg-yellow-300"
                       : ""
@@ -172,8 +188,8 @@ const TimeSheet = () => {
                   </td>
                   <td className="border border-gray-300">{ts.empTypeName}</td>
 
-                  {days.map((_, i) => {
-                    const shift = markTimeSheet(ts, i + 1);
+                  {days.map((d, i) => {
+                    const shift = markTimeSheet(ts, d.day);
                     let bgColor = "";
 
                     if (shift === "X") {
@@ -187,7 +203,7 @@ const TimeSheet = () => {
                     return (
                       <td
                         key={i}
-                        onClick={() => handleOpenTimeSheetModal(ts, i)}
+                        onClick={() => handleOpenTimeSheetModal(ts, d.day - 1)}
                         className={`border border-gray-300 cursor-pointer ${bgColor}`}
                       >
                         {shift}

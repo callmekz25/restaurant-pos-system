@@ -36,14 +36,6 @@ const router = createBrowserRouter([
           {
             element: (
               <Suspense fallback={<Loading />}>
-                <OrderDetail />
-              </Suspense>
-            ),
-            path: "/serving/orders/:orderId",
-          },
-          {
-            element: (
-              <Suspense fallback={<Loading />}>
                 <ReservedTable />
               </Suspense>
             ),
@@ -55,7 +47,7 @@ const router = createBrowserRouter([
                 <Order />
               </Suspense>
             ),
-            path: "/serving/orders/:tableId",
+            path: "/serving/orders/tables/:tableId",
           },
           {
             element: (
@@ -64,6 +56,14 @@ const router = createBrowserRouter([
               </Suspense>
             ),
             path: "/serving/orders/tables",
+          },
+          {
+            element: (
+              <Suspense fallback={<Loading />}>
+                <OrderDetail />
+              </Suspense>
+            ),
+            path: "/serving/orders/:orderId",
           },
           {
             element: (

@@ -28,6 +28,8 @@ import {
 } from "@/hooks/violationRecord";
 import IViolationRecordRequest from "@/interfaces/violationRecord/violationRecordRequest";
 import IViolationRecord from "@/interfaces/violationRecord/violationRecord";
+import { useGetWorkShifts } from "@/hooks/workshift";
+import IWorkShift from "@/interfaces/workshift/workshift";
 interface Ts extends IGroupTimeSheet {
   index: number;
 }
@@ -73,6 +75,7 @@ const TimeSheetModal = ({
     },
   ]);
   const timesheet = ts?.timesheets[ts.index];
+
   const statusAttendance = watch("statusAttendance");
 
   const menuTimeSheet = watch("menuTimeSheet");
@@ -86,6 +89,11 @@ const TimeSheetModal = ({
     error: errorVR,
     refetch,
   } = useGetVRByEmpIdAndWorkingDate(ts.empId, timesheet.workingDate);
+  const {
+    data: workshifts,
+    isLoading: isWorkShiftsLoading,
+    error: errorWorkShifts,
+  } = useGetWorkShifts();
   const { mutate: markWork, isPending: isMarkWorkPending } = useAttendance();
   const { mutate: markAbsent, isPending: isMarkAbsentPending } = useAbsent();
   const { mutate: addViolationRecord, isPending: isAddViolationRecordPending } =
@@ -151,14 +159,27 @@ const TimeSheetModal = ({
   };
   // Hàm ghi nhận phạt các vi phạm
   const handleAddViolationRecords = () => {
+    if (employeeViolations.length === violationRecords.length) {
+      return;
+    }
+    // Lọc ra mấy cái violation records mới thêm thay vì lấy luôn những cái cũ trong db
+    const filterNewViolationRecords = employeeViolations.filter(
+      (ev) =>
+        !violationRecords.some(
+          (vr: IViolationRecord) =>
+            vr.violation.violationId === ev.violation.violationId
+        )
+    );
+
     const violationRecordRequest: IViolationRecordRequest[] =
-      employeeViolations.map((ev) => {
+      filterNewViolationRecords.map((ev) => {
         return {
           violationId: ev.violation.violationId!,
           empId: ts.empId,
           workingDate: timesheet.workingDate,
         };
       });
+
     addViolationRecord(violationRecordRequest, {
       onSuccess: () => {
         console.log("Add violation record success!");
@@ -178,11 +199,17 @@ const TimeSheetModal = ({
       alert("Error try again!");
     }
   };
-  console.log(violationRecords);
 
-  if (isMarkWorkPending || isMarkAbsentPending || isAddViolationRecordPending) {
+  if (
+    isMarkWorkPending ||
+    isMarkAbsentPending ||
+    isAddViolationRecordPending ||
+    isWorkShiftsLoading
+  ) {
     return <TransparentLoading />;
   }
+  console.log(workshifts);
+
   return (
     <form>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -196,28 +223,6 @@ const TimeSheetModal = ({
                 Employee Name:{" "}
                 <span className="font-semibold text-[16px] ">{ts.empName}</span>
               </h4>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="font-medium">Work Shifts:</span>
-                <Controller
-                  name="workShiftId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      defaultValue={timesheet.workShiftId}
-                    >
-                      <SelectTrigger className=" border border-gray-300  rounded outline-none shadow-none  text-black ">
-                        <SelectValue placeholder="Chọn ca làm" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="F1">F1 (10:00 - 18:00)</SelectItem>
-                        <SelectItem value="F2">F2 (14:00 - 22:00)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
             </div>
             <div className="flex items-center gap-4 text-sm">
               <span className="font-medium">Time:</span>
@@ -248,7 +253,7 @@ const TimeSheetModal = ({
                   Violation
                 </li>
                 <li
-                  onClick={() => setValue("menuTimeSheet", "reward")}
+                  onClick={() => setValue("menuTimeSheet", "workshift")}
                   className={`px-5 cursor-pointer ${
                     menuTimeSheet === "reward"
                       ? "text-blue-700 opacity-100"
@@ -402,6 +407,39 @@ const TimeSheetModal = ({
                       <PlusIcon className="size-3" />
                       Add violation
                     </button>
+                  </div>
+                </>
+              )}
+              {menuTimeSheet === "workshift" && (
+                <>
+                  <div className="text-sm mt-5">
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className="font-medium">Work Shifts:</span>
+                      <Controller
+                        name="workShiftId"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <SelectTrigger className=" border border-gray-300  rounded outline-none shadow-none  text-black ">
+                              <SelectValue placeholder="Chọn ca làm" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {workshifts?.map((ws: IWorkShift) => (
+                                <SelectItem
+                                  key={ws.workShiftId}
+                                  value={ws.workShiftName}
+                                >
+                                  {ws.workShiftName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </div>
                   </div>
                 </>
               )}

@@ -55,7 +55,7 @@ const router = createBrowserRouter([
                 <Order />
               </Suspense>
             ),
-            path: "/serving/orders/:tableId",
+            path: "/serving/orders/tables/:tableId",
           },
           {
             element: (

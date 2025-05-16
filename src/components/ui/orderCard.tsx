@@ -1,4 +1,5 @@
 import OrderStatus from "@/enum/orderStatus";
+import Order from "@/pages/order/Order";
 import formatDate from "@/utils/formatDate";
 import formatPriceToVND from "@/utils/formatPriceToVND";
 import formatTime from "@/utils/formatTime";
@@ -25,7 +26,13 @@ const OrderCard = ({
           <h3 className="font-semibold text-sm">Guest</h3>
           <span className="text-sm opacity-80">#{orderId}</span>
         </div>
-        <div className="flex   bg-[#daebfb] text-blue-600 items-center gap-2 rounded-full py-1 px-2">
+        <div
+          className={`flex ${
+            statusOrder == OrderStatus.FINISHED
+              ? "bg-[#daebfb]  text-blue-600"
+              : "bg-gray-300"
+          } items-center gap-2 rounded-full py-1 px-2`}
+        >
           <ClockIcon className="size-4" />
           <span className="text-[12px]  font-medium">{statusOrder}</span>
         </div>

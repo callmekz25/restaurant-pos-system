@@ -144,7 +144,8 @@ const ReservedTable = () => {
                 }}
               ></input>
               <Select
-                defaultValue=""
+                defaultValue={reservedTable.seatId}
+                value={reservedTable.seatId}
                 onValueChange={(value) =>
                   setReservedTable({ ...reservedTable, seatId: value })
                 }

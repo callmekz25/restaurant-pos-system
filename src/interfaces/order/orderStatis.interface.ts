@@ -11,6 +11,7 @@ interface OrderStatis {
   timeIn: Date;
   timeOut: Date;
   discount: number;
+  note: string;
   foods: OnTableOrderDetail[];
   surcharge: number;
   paymentMethod: PaymentMethod;
